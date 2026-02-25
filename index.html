@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lista VIP - v19 Scanner Pro</title>
+    <title>Lista VIP - v20 Precision</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
     <style>
         :root { --p: #6366f1; --s: #22c55e; --d: #ef4444; --bg: #f1f5f9; --c: #ffffff; --text: #1e293b; }
@@ -20,9 +20,9 @@
         .mini-input { padding: 6px; font-size: 0.85rem; border: 1px solid #e2e8f0; border-radius: 4px; text-align: right; width: 100%; }
         .category-header { background: #e2e8f0; padding: 8px 12px; border-radius: 6px; font-weight: bold; margin-top: 15px; font-size: 0.75rem; text-transform: uppercase; color: #475569; }
         
-        /* Modal do Scanner Otimizado */
-        .modal { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); display:none; align-items:center; justify-content:center; z-index:200; padding: 10px; box-sizing: border-box; }
-        .modal-content { background:white; padding:15px; border-radius:15px; width:100%; max-width:450px; }
+        /* MODAL SCANNER - CAMADA MÁXIMA */
+        .modal { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); display:none; align-items:center; justify-content:center; z-index:9999; padding: 10px; box-sizing: border-box; }
+        .modal-content { background:white; padding:15px; border-radius:15px; width:100%; max-width:450px; position: relative; }
         #interactive.viewport { width: 100%; height: 300px; border-radius: 12px; overflow: hidden; background: #000; position: relative; }
         #interactive.viewport video, canvas { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; }
         .scanner-laser { position: absolute; top: 50%; left: 10%; width: 80%; height: 2px; background: red; box-shadow: 0 0 8px red; z-index: 10; animation: laser 2s infinite; }
@@ -53,7 +53,7 @@
     <div id="screenEditor" class="screen">
         <div style="display:flex; align-items:center; gap:10px; margin-bottom:15px;">
             <button class="btn" onclick="irParaHome()">←</button>
-            <h3 id="tituloListaAtual" style="margin:0; flex:1; font-size: 1rem;"></h3>
+            <h3 id="tituloListaAtual" style="margin:0; flex:1;"></h3>
         </div>
         <div style="background:#f8fafc; padding:15px; border-radius:12px; border:1px solid #e2e8f0; margin-bottom:15px;">
             <button class="btn btn-scan" onclick="iniciarLeitor('lista')">📸 Scanear Produto</button>
@@ -79,18 +79,18 @@
         <div id="interactive" class="viewport">
             <div class="scanner-laser"></div>
         </div>
-        <p style="text-align:center; font-size: 12px; color: #666;">Alinhe o código de barras com a linha vermelha</p>
+        <p style="text-align:center; font-size: 12px; color: #666; margin: 10px 0;">Foque no código de barras</p>
         <button class="btn btn-p" onclick="pararLeitor()">Cancelar</button>
     </div>
 </div>
 
-<div id="modalCatalogo" class="modal">
-    <div class="modal-content">
+<div id="modalCatalogo" class="modal" style="background:rgba(0,0,0,0.8); z-index: 1000;">
+    <div class="modal-content" style="max-height: 90vh; overflow-y: auto;">
         <h3>📦 Gestão de Catálogo</h3>
         <button class="btn btn-scan" onclick="iniciarLeitor('catalogo')">📸 Scanear EAN</button>
         <div id="loadingEan" class="loading">🔍 Buscando na internet...</div>
         <div style="background: #f1f5f9; padding: 10px; border-radius: 10px; margin-bottom: 15px;">
-            <input type="text" id="catEan" placeholder="Código EAN (Opcional)" oninput="autoPreencher(this.value, 'catalogo')">
+            <input type="text" id="catEan" placeholder="Código EAN" oninput="autoPreencher(this.value, 'catalogo')">
             <input type="text" id="catNome" placeholder="Nome do Produto">
             <select id="catCatSelect"></select>
             <input type="number" id="catPreco" placeholder="Preço R$">
@@ -101,7 +101,7 @@
     </div>
 </div>
 
-<div id="modalCats" class="modal">
+<div id="modalCats" class="modal" style="background:rgba(0,0,0,0.8); z-index: 1000;">
     <div class="modal-content">
         <h3>⚙️ Categorias</h3>
         <button class="btn btn-p" onclick="addCat()">+ Nova Categoria</button>
@@ -164,8 +164,10 @@
         }
     }
 
-    // --- SCANNER OTIMIZADO V19 ---
+    // --- SCANNER PRECISION v20 ---
+    let scanResults = [];
     function iniciarLeitor(alvo) {
+        scanResults = [];
         document.getElementById('modalScanner').style.display = 'flex';
         
         Quagga.init({
@@ -173,34 +175,36 @@
                 name: "Live",
                 type: "LiveStream",
                 target: document.querySelector('#interactive'),
-                constraints: {
-                    facingMode: "environment",
-                    aspectRatio: { min: 1, max: 2 }
-                },
+                constraints: { facingMode: "environment" },
             },
             locator: { patchSize: "medium", halfSample: true },
             decoder: { readers: ["ean_reader", "ean_8_reader"] }
         }, (err) => {
-            if (err) { alert("Erro ao abrir câmera"); return; }
+            if (err) { alert("Erro câmera"); return; }
             Quagga.start();
         });
 
         Quagga.onDetected((data) => {
-            if (data.codeResult && data.codeResult.code) {
-                const code = data.codeResult.code;
-                
-                // Filtro básico para evitar leituras borradas (EAN-13 tem 13 digitos)
-                if(code.length < 8) return;
+            const code = data.codeResult.code;
+            if (code.length < 8) return;
 
-                Quagga.offDetected(); 
-                Quagga.stop();
-                document.getElementById('modalScanner').style.display = 'none';
+            // Filtro de consistência: precisa ler o mesmo código 3 vezes seguidas
+            scanResults.push(code);
+            if (scanResults.length >= 3) {
+                const count = scanResults.filter(r => r === code).length;
+                if (count >= 2) {
+                    Quagga.offDetected(); 
+                    Quagga.stop();
+                    document.getElementById('modalScanner').style.display = 'none';
 
-                if (alvo === 'catalogo') { 
-                    document.getElementById('catEan').value = code; 
-                    autoPreencher(code, 'catalogo'); 
-                } else { 
-                    autoPreencher(code, 'lista'); 
+                    if (alvo === 'catalogo') { 
+                        document.getElementById('catEan').value = code; 
+                        autoPreencher(code, 'catalogo'); 
+                    } else { 
+                        autoPreencher(code, 'lista'); 
+                    }
+                } else {
+                    scanResults.shift();
                 }
             }
         });
