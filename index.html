@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lista Compras - Mercado - v32 FixedScan</title>
+    <title>Lista de Compras - Supermercado - Jrcollo - V33</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
     <style>
         :root { --p: #6366f1; --s: #22c55e; --bg: #f1f5f9; --c: #ffffff; --text: #1e293b; }
@@ -16,7 +16,7 @@
         .btn-w { background: #25d366; color: white; width: 100%; margin: 15px 0; }
         .btn-scan { background: #334155; color: white; width: 100%; margin-bottom: 10px; }
         
-        /* LAYOUT SCANNER CORRIGIDO */
+        /* LAYOUT SCANNER */
         .modal-scanner { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); display:none; flex-direction: column; z-index: 99999; }
         #interactive.viewport { width: 100%; height: 70vh; background: #000; position: relative; overflow: hidden; }
         #interactive.viewport video, canvas { width: 100%; height: 100%; object-fit: cover; }
@@ -40,7 +40,7 @@
 
 <div class="app-container">
     <div id="screenHome" class="screen active">
-        <h2 style="text-align:center">🛒 Lista VIP v32</h2>
+        <h2 style="text-align:center">🛒 Lista de Compras - Jrcollo</h2>
         <div style="display:flex; gap:8px; margin-bottom:20px;">
             <input type="text" id="novaListaNome" placeholder="Nome da Lista">
             <button class="btn btn-p" onclick="criarNovaLista()" style="width:auto">Criar</button>
@@ -145,7 +145,7 @@
                     resolution: { width: 1280, height: 720 }
                 },
             },
-            locator: { patchSize: "large", halfSample: false }, // Configuração para melhor detecção
+            locator: { patchSize: "large", halfSample: false },
             decoder: { readers: ["ean_reader", "ean_8_reader"] },
             locate: true
         }, function(err) {
@@ -181,19 +181,29 @@
     }
 
     async function buscarPorEan(ean, contexto) {
+        if(!ean || (ean.length !== 8 && ean.length !== 13)) return;
+        
         const prefix = contexto === 'lista' ? 'prod' : 'cat';
+        
+        // 1. Busca Local
         if(appData.catalogo[ean]) {
             const item = appData.catalogo[ean];
             document.getElementById(prefix+'Nome').value = item.nome;
             const p = document.getElementById(prefix+'ValP') || document.getElementById(prefix+'Preco');
             p.value = item.preco;
             document.getElementById(prefix+'CatSelect').value = item.categoria;
-        } else if(ean.length >= 8) {
-            try {
-                const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${ean}.json`);
-                const data = await res.json();
-                if(data.status === 1) document.getElementById(prefix+'Nome').value = data.product.product_name || "";
-            } catch(e){}
+            return;
+        }
+
+        // 2. Busca Online
+        try {
+            const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${ean}.json`);
+            const data = await res.json();
+            if(data.status === 1) {
+                document.getElementById(prefix+'Nome').value = data.product.product_name || data.product.generic_name || "";
+            }
+        } catch(e){
+            console.log("Erro na busca online");
         }
     }
 
