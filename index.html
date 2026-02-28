@@ -286,4 +286,44 @@
                 <div class="item-row">
                     <div style="display:flex; justify-content:space-between; font-weight:bold; margin-bottom:5px;">
                         <span>${item.nome}</span>
-                        <span onclick="appData.listas[listaAtiva].splice(${idx},1);salvar();renderItens();" style="color:red
+                        <span onclick="appData.listas[listaAtiva].splice(${idx},1);salvar();renderItens();" style="color:red">🗑️</span>
+                    </div>
+                    <div class="calc-grid">
+                        <input type="checkbox" ${item.noCarrinho?'checked':''} onclick="appData.listas[listaAtiva][${idx}].noCarrinho=!appData.listas[listaAtiva][${idx}].noCarrinho;salvar();">
+                        <div style="font-size:0.6rem">PREV.</div><div>${item.qtdP}</div><div>${item.valP.toFixed(2)}</div><div style="text-align:right">${(item.qtdP*item.valP).toFixed(2)}</div>
+                    </div>
+                    <div class="calc-grid" style="font-weight:bold; margin-top:5px;">
+                        <div></div><div style="font-size:0.6rem; color:var(--s)">REAL</div>
+                        <div><input type="number" class="mini-input" value="${item.qtdR}" oninput="appData.listas[listaAtiva][${idx}].qtdR=parseFloat(this.value)||0;salvar();calcularTotais();"></div>
+                        <div><input type="number" class="mini-input" value="${item.valR}" oninput="appData.listas[listaAtiva][${idx}].valR=parseFloat(this.value)||0;salvar();calcularTotais();"></div>
+                        <div style="text-align:right; color:var(--s)">${(item.qtdR*item.valR).toFixed(2)}</div>
+                    </div>
+                </div>`;
+            });
+        });
+        calcularTotais();
+    }
+    function calcularTotais() {
+        const itens = appData.listas[listaAtiva] || [];
+        const tP = itens.reduce((acc, i) => acc + (i.qtdP * i.valP), 0);
+        const tR = itens.reduce((acc, i) => acc + (i.qtdR * i.valR), 0);
+        document.getElementById('totalPrevisto').innerText = `R$ ${tP.toFixed(2)}`;
+        document.getElementById('totalReal').innerText = `R$ ${tR.toFixed(2)}`;
+    }
+
+    function irParaHome() { document.getElementById('screenEditor').classList.remove('active'); document.getElementById('screenHome').classList.add('active'); renderHome(); }
+    function renderHome() {
+        document.getElementById('listaDeArquivos').innerHTML = Object.keys(appData.listas).map(id => `
+            <div class="list-card">
+                <b onclick="abrirLista('${id}')" style="flex:1">${id}</b>
+                <span><b onclick="if(confirm('Apagar lista?')){delete appData.listas['${id}']; salvar(); renderHome();}" style="color:red">🗑️</b></span>
+            </div>`).join('');
+    }
+
+    function exportarBackup() { prompt("Copie o backup:", btoa(unescape(encodeURIComponent(JSON.stringify(appData))))); }
+    function importarBackup() { const c = prompt("Cole o backup:"); if(c){ appData=JSON.parse(decodeURIComponent(escape(atob(c)))); salvar(); location.reload(); }}
+
+    renderHome();
+</script>
+</body>
+</html>
