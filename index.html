@@ -9,31 +9,79 @@
         :root { --p: #6366f1; --s: #22c55e; --bg: #f1f5f9; --c: #ffffff; --text: #1e293b; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 10px; display: flex; justify-content: center; }
         .app-container { background: var(--c); padding: 15px; border-radius: 20px; width: 100%; max-width: 600px; min-height: 95vh; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
-        .screen { display: none; } .screen.active { display: block; }
-        input, select { padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 16px; width: 100%; margin-bottom: 8px; box-sizing: border-box; }
-        .btn { border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .screen { display: none; }
+        .screen.active { display: block; }
+        input, select {
+            padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px;
+            font-size: 16px; width: 100%; margin-bottom: 8px; box-sizing: border-box;
+        }
+        .btn {
+            border: none; padding: 12px; border-radius: 8px; cursor: pointer;
+            font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
         .btn-p { background: var(--p); color: white; width: 100%; }
         .btn-w { background: #25d366; color: white; width: 100%; margin: 15px 0; }
         .btn-scan { background: #334155; color: white; width: 100%; margin-bottom: 10px; }
-        
+
         /* LAYOUT SCANNER */
-        .modal-scanner { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); display:none; flex-direction: column; z-index: 99999; }
-        #interactive.viewport { width: 100%; height: 70vh; background: #000; position: relative; overflow: hidden; }
-        #interactive.viewport video, canvas { width: 100%; height: 100%; object-fit: cover; }
-        .scan-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; height: 120px; border: 2px solid var(--s); border-radius: 10px; z-index: 10; box-shadow: 0 0 0 1000px rgba(0,0,0,0.5); }
-        .scan-line { position: absolute; width: 100%; height: 2px; background: red; top: 50%; box-shadow: 0 0 8px red; animation: scanAnim 2s infinite; z-index: 11; }
+        .modal-scanner {
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background:rgba(0,0,0,0.9); display:none; flex-direction: column; z-index: 99999;
+        }
+        #interactive.viewport {
+            width: 100%; height: 70vh; background: #000; position: relative; overflow: hidden;
+        }
+        #interactive.viewport video,
+        #interactive.viewport canvas {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+        .scan-overlay {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 84%; height: min(22vh, 140px); min-height: 110px;
+            border: 2px solid var(--s); border-radius: 10px; z-index: 10;
+            box-shadow: 0 0 0 1000px rgba(0,0,0,0.52);
+            pointer-events: none;
+        }
+        .scan-line {
+            position: absolute; width: 100%; height: 2px; background: red; top: 50%;
+            box-shadow: 0 0 8px red; animation: scanAnim 2s infinite; z-index: 11;
+        }
         @keyframes scanAnim { 0% { top: 0%; } 50% { top: 100%; } 100% { top: 0%; } }
-        .scanner-footer { background:#000; padding:20px; text-align:center; flex:1; display:flex; flex-direction:column; justify-content:center; }
-        
+        .scanner-footer {
+            background:#000; padding:20px; text-align:center; flex:1; display:flex;
+            flex-direction:column; justify-content:center;
+        }
+
         /* OUTROS MODAIS */
-        .modal { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:none; justify-content:center; align-items:center; z-index: 9000; }
-        .modal-content { background:#fff; width:90%; max-width:450px; padding:20px; border-radius:15px; max-height:85vh; overflow-y:auto; }
-        
+        .modal {
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background:rgba(0,0,0,0.8); display:none; justify-content:center; align-items:center; z-index: 9000;
+        }
+        .modal-content {
+            background:#fff; width:90%; max-width:450px; padding:20px; border-radius:15px;
+            max-height:85vh; overflow-y:auto;
+        }
+
         .item-row { border-bottom: 2px solid #f1f5f9; padding: 12px 0; }
-        .category-header { background: #f1f5f9; padding: 8px; border-radius: 6px; font-weight: 800; margin-top: 15px; font-size: 0.75rem; color: var(--p); text-transform: uppercase; }
-        .calc-grid { display: grid; grid-template-columns: 30px 1.2fr 1fr 1fr 1fr; gap: 5px; align-items: center; font-size: 0.8rem; }
-        .mini-input { padding: 6px; font-size: 0.85rem; border: 1px solid #e2e8f0; border-radius: 4px; text-align: right; width: 100%; }
-        .footer-summary { position: sticky; bottom: 0; background: white; padding: 15px; border-top: 2px solid #e2e8f0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .category-header {
+            background: #f1f5f9; padding: 8px; border-radius: 6px; font-weight: 800;
+            margin-top: 15px; font-size: 0.75rem; color: var(--p); text-transform: uppercase;
+        }
+        .calc-grid {
+            display: grid; grid-template-columns: 30px 1.2fr 1fr 1fr 1fr;
+            gap: 5px; align-items: center; font-size: 0.8rem;
+        }
+        .mini-input {
+            padding: 6px; font-size: 0.85rem; border: 1px solid #e2e8f0;
+            border-radius: 4px; text-align: right; width: 100%;
+        }
+        .footer-summary {
+            position: sticky; bottom: 0; background: white; padding: 15px;
+            border-top: 2px solid #e2e8f0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+        }
+        .scanner-status {
+            color:#93c5fd; font-size:13px; min-height:18px; margin-top:8px;
+        }
     </style>
 </head>
 <body>
@@ -62,9 +110,19 @@
         </div>
         <div style="background:#f8fafc; padding:15px; border-radius:12px; border:1px solid #e2e8f0; margin-bottom:15px;">
             <button class="btn btn-scan" onclick="iniciarLeitor('lista')">📸 Scanear Produto</button>
-            <input type="number" id="prodEan" placeholder="Código de Barras" oninput="buscarPorEan(this.value, 'lista')">
+
+            <input
+                type="text"
+                id="prodEan"
+                inputmode="numeric"
+                autocomplete="off"
+                placeholder="Código de Barras"
+                oninput="buscarPorEan(this.value, 'lista')"
+            >
+
             <input type="text" id="prodNome" list="sugestoes" placeholder="Nome do Produto" oninput="buscarPorNome(this.value)">
             <datalist id="sugestoes"></datalist>
+
             <div style="display:grid; grid-template-columns: 1.5fr 1fr 1.2fr; gap:8px;">
                 <select id="prodCatSelect"></select>
                 <input type="number" id="prodQtdP" value="1">
@@ -72,8 +130,11 @@
                 <button class="btn btn-p" onclick="adicionarItem()" style="grid-column: span 3;">Adicionar</button>
             </div>
         </div>
+
         <div id="corpoLista"></div>
+
         <button class="btn btn-w" onclick="compartilharWhatsApp()">Finalizar e Enviar WhatsApp</button>
+
         <div class="footer-summary">
             <div style="text-align:center;"><small>PREVISTO</small><br><b id="totalPrevisto">R$ 0.00</b></div>
             <div style="text-align:center; color:var(--s);"><small>REAL</small><br><b id="totalReal">R$ 0.00</b></div>
@@ -86,8 +147,9 @@
         <div class="scan-overlay"><div class="scan-line"></div></div>
     </div>
     <div class="scanner-footer">
-        <p style="color:#fff; margin-bottom:15px; font-size:14px;">Ajuste o código dentro do retângulo</p>
-        <button class="btn" style="background:#ef4444; color:#fff; width:100%; padding:15px" onclick="pararLeitor()">Cancelar</button>
+        <p style="color:#fff; margin-bottom:10px; font-size:14px;">Ajuste o código principal dentro do retângulo e aproxime até ele ocupar boa parte da área.</p>
+        <div id="scannerStatus" class="scanner-status">Preparando câmera...</div>
+        <button class="btn" style="background:#ef4444; color:#fff; width:100%; padding:15px; margin-top:12px;" onclick="pararLeitor()">Cancelar</button>
     </div>
 </div>
 
@@ -95,7 +157,16 @@
     <div class="modal-content">
         <h3>📦 Catálogo</h3>
         <button class="btn btn-scan" onclick="iniciarLeitor('catalogo')">📸 Scanear p/ Catálogo</button>
-        <input type="number" id="catEan" placeholder="Código EAN" oninput="buscarPorEan(this.value, 'catalogo')">
+
+        <input
+            type="text"
+            id="catEan"
+            inputmode="numeric"
+            autocomplete="off"
+            placeholder="Código EAN"
+            oninput="buscarPorEan(this.value, 'catalogo')"
+        >
+
         <input type="text" id="catNome" placeholder="Nome">
         <select id="catCatSelect"></select>
         <input type="number" id="catPreco" placeholder="Preço R$">
@@ -115,101 +186,362 @@
 
 <script>
     const KEY = 'app_v29_storage';
-    const CATS_PADRAO = ["🛒 Mercearia", "🍎 Hortifruti", "🥩 Açougue", "🥖 Padaria", "🧀 Frios/Laticínios", "❄️ Congelados", "🥤 Bebidas", "🧼 Higiene", "🧹 Limpeza", "🏠 Utilidades Domésticas", "🐾 Pet Shop", "👧 Lanche Crianças", "📦 Outros"];
+    const CATS_PADRAO = [
+        "🛒 Mercearia", "🍎 Hortifruti", "🥩 Açougue", "🥖 Padaria", "🧀 Frios/Laticínios",
+        "❄️ Congelados", "🥤 Bebidas", "🧼 Higiene", "🧹 Limpeza", "🏠 Utilidades Domésticas",
+        "🐾 Pet Shop", "👧 Lanche Crianças", "📦 Outros"
+    ];
 
     let appData = JSON.parse(localStorage.getItem(KEY)) || { listas: {}, categorias: CATS_PADRAO, catalogo: {} };
+    appData.listas = appData.listas || {};
+    appData.catalogo = appData.catalogo || {};
+    appData.categorias = Array.isArray(appData.categorias) && appData.categorias.length ? appData.categorias : [...CATS_PADRAO];
+
     let listaAtiva = null;
     let scannerAlvo = 'lista';
+    let scannerRodando = false;
+    let quaggaDetectedHandler = null;
+    let candidatosLeitura = new Map();
 
-    function salvar() { localStorage.setItem(KEY, JSON.stringify(appData)); atualizarDatalist(); }
+    function salvar() {
+        localStorage.setItem(KEY, JSON.stringify(appData));
+        atualizarDatalist();
+    }
 
     function atualizarDatalist() {
         const dl = document.getElementById('sugestoes');
-        const nomes = Object.values(appData.catalogo).map(i => i.nome);
-        dl.innerHTML = [...new Set(nomes)].map(n => `<option value="${n}">`).join('');
+        const nomes = Object.values(appData.catalogo).map(i => i.nome).filter(Boolean);
+        dl.innerHTML = [...new Set(nomes)].map(n => `<option value="${escapeHtml(n)}">`).join('');
     }
 
-    // --- LÓGICA DO SCANNER ---
+    function escapeHtml(str) {
+        return String(str ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function somenteDigitos(valor) {
+        return String(valor || '').replace(/\D/g, '');
+    }
+
+    function formatarMoedaBr(valor) {
+        return Number(valor || 0).toFixed(2);
+    }
+
+    function resetarViewportScanner() {
+        document.getElementById('interactive').innerHTML = `
+            <div class="scan-overlay"><div class="scan-line"></div></div>
+        `;
+    }
+
+    function limparEventosScanner() {
+        try {
+            if (quaggaDetectedHandler) {
+                Quagga.offDetected(quaggaDetectedHandler);
+                quaggaDetectedHandler = null;
+            }
+        } catch (e) {}
+    }
+
+    function atualizarStatusScanner(msg) {
+        const el = document.getElementById('scannerStatus');
+        if (el) el.textContent = msg;
+    }
+
+    function distanciaPontos(a, b) {
+        if (!a || !b) return 0;
+        const dx = (a.x ?? a[0] ?? 0) - (b.x ?? b[0] ?? 0);
+        const dy = (a.y ?? a[1] ?? 0) - (b.y ?? b[1] ?? 0);
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    function larguraDeteccao(data) {
+        if (data && Array.isArray(data.line) && data.line.length >= 2) {
+            return distanciaPontos(data.line[0], data.line[1]);
+        }
+        if (data && Array.isArray(data.box) && data.box.length >= 4) {
+            const lado1 = distanciaPontos(data.box[0], data.box[1]);
+            const lado2 = distanciaPontos(data.box[1], data.box[2]);
+            return Math.max(lado1, lado2);
+        }
+        return 0;
+    }
+
+    function getLarguraVideoAtual() {
+        const video = document.querySelector('#interactive video');
+        return video && video.videoWidth ? video.videoWidth : Math.max(document.getElementById('interactive').clientWidth || 1, 1);
+    }
+
+    function ean13Valido(code) {
+        if (!/^\d{13}$/.test(code)) return false;
+        let soma = 0;
+        for (let i = 0; i < 12; i++) {
+            soma += parseInt(code[i], 10) * (i % 2 === 0 ? 1 : 3);
+        }
+        const digito = (10 - (soma % 10)) % 10;
+        return digito === parseInt(code[12], 10);
+    }
+
+    function ean8Valido(code) {
+        if (!/^\d{8}$/.test(code)) return false;
+        let soma = 0;
+        for (let i = 0; i < 7; i++) {
+            soma += parseInt(code[i], 10) * (i % 2 === 0 ? 3 : 1);
+        }
+        const digito = (10 - (soma % 10)) % 10;
+        return digito === parseInt(code[7], 10);
+    }
+
+    function codigoDeBarrasValido(code) {
+        return ean13Valido(code) || ean8Valido(code);
+    }
+
+    function limparCandidatosAntigos() {
+        const agora = Date.now();
+        for (const [codigo, info] of candidatosLeitura.entries()) {
+            if (agora - info.ultimo > 1800) {
+                candidatosLeitura.delete(codigo);
+            }
+        }
+    }
+
+    function confirmarLeituraScanner(code) {
+        if (navigator.vibrate) navigator.vibrate(100);
+
+        pararLeitor();
+
+        const campo = scannerAlvo === 'lista' ? 'prodEan' : 'catEan';
+        document.getElementById(campo).value = code;
+        buscarPorEan(code, scannerAlvo);
+    }
+
+    async function aplicarMelhoriasCameraSePossivel() {
+        try {
+            await new Promise(r => setTimeout(r, 500));
+
+            const video = document.querySelector('#interactive video');
+            if (!video || !video.srcObject) return;
+
+            const track = video.srcObject.getVideoTracks && video.srcObject.getVideoTracks()[0];
+            if (!track || typeof track.getCapabilities !== 'function' || typeof track.applyConstraints !== 'function') return;
+
+            const caps = track.getCapabilities();
+            const advanced = [];
+
+            if (caps.focusMode && Array.isArray(caps.focusMode) && caps.focusMode.includes('continuous')) {
+                advanced.push({ focusMode: 'continuous' });
+            }
+
+            if (caps.zoom && typeof caps.zoom.min === 'number' && typeof caps.zoom.max === 'number') {
+                const zoomIdeal = Math.min(caps.zoom.max, Math.max(caps.zoom.min, 2));
+                advanced.push({ zoom: zoomIdeal });
+            }
+
+            if (advanced.length) {
+                await track.applyConstraints({ advanced });
+            }
+        } catch (e) {
+            // Ignora se o aparelho/navegador não suportar
+        }
+    }
+
     function iniciarLeitor(alvo) {
         scannerAlvo = alvo;
+        candidatosLeitura = new Map();
+
+        if (scannerRodando) {
+            pararLeitor(true);
+        }
+
+        resetarViewportScanner();
         document.getElementById('modalScanner').style.display = 'flex';
-        
+        atualizarStatusScanner('Abrindo câmera...');
+
+        const target = document.querySelector('#interactive');
+
         Quagga.init({
             inputStream: {
                 name: "Live",
                 type: "LiveStream",
-                target: document.querySelector('#interactive'),
+                target: target,
                 constraints: {
-                    facingMode: "environment",
-                    aspectRatio: { min: 1, max: 2 },
-                    resolution: { width: 1280, height: 720 }
+                    facingMode: { ideal: "environment" },
+                    width: { ideal: 1920 },
+                    height: { ideal: 1080 }
                 },
+                area: {
+                    top: "33%",
+                    right: "8%",
+                    left: "8%",
+                    bottom: "33%"
+                },
+                singleChannel: false
             },
-            locator: { patchSize: "large", halfSample: false },
-            decoder: { readers: ["ean_reader", "ean_8_reader"] },
+            locator: {
+                patchSize: "small",
+                halfSample: true
+            },
+            numOfWorkers: Math.min(navigator.hardwareConcurrency || 2, 4),
+            frequency: 10,
+            decoder: {
+                readers: ["ean_reader", "ean_8_reader"],
+                multiple: false
+            },
             locate: true
-        }, function(err) {
-            if (err) { alert("Erro ao abrir câmera: " + err); return; }
-            Quagga.start();
-        });
-
-        let lastCode = null;
-        let count = 0;
-        Quagga.onDetected(data => {
-            let code = data.codeResult.code;
-            if(code === lastCode) { count++; } else { lastCode = code; count = 0; }
-
-            if(count >= 3) {
-                if (navigator.vibrate) navigator.vibrate(100);
+        }, async function(err) {
+            if (err) {
+                alert("Erro ao abrir câmera: " + err);
                 pararLeitor();
-                const campo = scannerAlvo === 'lista' ? 'prodEan' : 'catEan';
-                document.getElementById(campo).value = code;
-                buscarPorEan(code, scannerAlvo);
+                return;
             }
+
+            scannerRodando = true;
+            Quagga.start();
+            atualizarStatusScanner('Aponte para o código principal dentro do retângulo.');
+            await aplicarMelhoriasCameraSePossivel();
         });
+
+        limparEventosScanner();
+
+        quaggaDetectedHandler = function(data) {
+            try {
+                const code = somenteDigitos(data?.codeResult?.code || '');
+                if (!code) return;
+                if (!codigoDeBarrasValido(code)) return;
+
+                const largura = larguraDeteccao(data);
+                const larguraVideo = getLarguraVideoAtual();
+                const proporcao = larguraVideo ? (largura / larguraVideo) : 0;
+
+                // Rejeita leituras muito pequenas, que normalmente são códigos secundários/errados
+                if (proporcao < 0.35) {
+                    atualizarStatusScanner('Aproxime mais o código principal.');
+                    return;
+                }
+
+                limparCandidatosAntigos();
+
+                const atual = candidatosLeitura.get(code) || { hits: 0, ultimo: 0, melhorProporcao: 0 };
+                atual.hits += 1;
+                atual.ultimo = Date.now();
+                atual.melhorProporcao = Math.max(atual.melhorProporcao, proporcao);
+                candidatosLeitura.set(code, atual);
+
+                atualizarStatusScanner(`Lendo ${code}... confirmação ${atual.hits}/4`);
+
+                if (atual.hits >= 4 || (atual.hits >= 3 && atual.melhorProporcao >= 0.5)) {
+                    confirmarLeituraScanner(code);
+                }
+            } catch (e) {
+                console.log('Erro no processamento da leitura', e);
+            }
+        };
+
+        Quagga.onDetected(quaggaDetectedHandler);
     }
 
-    function pararLeitor() { Quagga.stop(); document.getElementById('modalScanner').style.display = 'none'; }
+    function pararLeitor(silencioso = false) {
+        limparEventosScanner();
 
-    // --- OUTRAS FUNÇÕES ---
+        try {
+            Quagga.stop();
+        } catch (e) {}
+
+        scannerRodando = false;
+        candidatosLeitura = new Map();
+        document.getElementById('modalScanner').style.display = 'none';
+        atualizarStatusScanner('Scanner encerrado.');
+        resetarViewportScanner();
+
+        if (!silencioso) {
+            // sem alertas
+        }
+    }
+
     function buscarPorNome(nome) {
-        const item = Object.values(appData.catalogo).find(i => i.nome.toLowerCase() === nome.toLowerCase());
-        if(item) {
-            document.getElementById('prodValP').value = item.preco;
-            document.getElementById('prodCatSelect').value = item.categoria;
+        const nomeNormalizado = String(nome || '').trim().toLowerCase();
+        if (!nomeNormalizado) return;
+
+        const itemEncontrado = Object.entries(appData.catalogo).find(([ean, item]) =>
+            String(item.nome || '').trim().toLowerCase() === nomeNormalizado
+        );
+
+        if (itemEncontrado) {
+            const [ean, item] = itemEncontrado;
+            document.getElementById('prodEan').value = ean.startsWith('INT_') ? '' : ean;
+            document.getElementById('prodValP').value = item.preco ?? '';
+            document.getElementById('prodCatSelect').value = item.categoria ?? '';
         }
     }
 
     async function buscarPorEan(ean, contexto) {
-        if(!ean || (ean.length !== 8 && ean.length !== 13)) return;
-        
+        const codigo = somenteDigitos(ean);
         const prefix = contexto === 'lista' ? 'prod' : 'cat';
-        
-        // 1. Busca Local
-        if(appData.catalogo[ean]) {
-            const item = appData.catalogo[ean];
-            document.getElementById(prefix+'Nome').value = item.nome;
-            const p = document.getElementById(prefix+'ValP') || document.getElementById(prefix+'Preco');
-            p.value = item.preco;
-            document.getElementById(prefix+'CatSelect').value = item.categoria;
+        const campoCodigo = document.getElementById(prefix + 'Ean');
+        if (campoCodigo) campoCodigo.value = codigo;
+
+        if (!codigo || (codigo.length !== 8 && codigo.length !== 13)) return;
+        if (!codigoDeBarrasValido(codigo)) return;
+
+        // 1. Busca local
+        if (appData.catalogo[codigo]) {
+            const item = appData.catalogo[codigo];
+            document.getElementById(prefix + 'Nome').value = item.nome || '';
+
+            const campoPreco = document.getElementById(prefix + 'ValP') || document.getElementById(prefix + 'Preco');
+            if (campoPreco) campoPreco.value = item.preco ?? '';
+
+            const campoCat = document.getElementById(prefix + 'CatSelect');
+            if (campoCat) campoCat.value = item.categoria || '';
             return;
         }
 
-        // 2. Busca Online
+        // 2. Busca online
         try {
-            const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${ean}.json`);
+            const url = `https://world.openfoodfacts.net/api/v2/product/${codigo}?fields=product_name,product_name_pt,product_name_en,generic_name,generic_name_pt,brands`;
+            const res = await fetch(url);
+            if (!res.ok) throw new Error('Falha na consulta');
             const data = await res.json();
-            if(data.status === 1) {
-                document.getElementById(prefix+'Nome').value = data.product.product_name || data.product.generic_name || "";
+
+            if (data.status === 1 && data.product) {
+                const p = data.product;
+                const nomeBase =
+                    p.product_name_pt ||
+                    p.product_name ||
+                    p.product_name_en ||
+                    p.generic_name_pt ||
+                    p.generic_name ||
+                    '';
+
+                const marca = String(p.brands || '').split(',')[0].trim();
+                let nomeFinal = nomeBase.trim();
+
+                if (!nomeFinal && marca) nomeFinal = marca;
+                if (nomeFinal && marca && !nomeFinal.toLowerCase().includes(marca.toLowerCase())) {
+                    nomeFinal = `${nomeFinal} - ${marca}`;
+                }
+
+                if (nomeFinal) {
+                    document.getElementById(prefix + 'Nome').value = nomeFinal;
+                }
             }
-        } catch(e){
+        } catch (e) {
             console.log("Erro na busca online");
         }
     }
 
     function criarNovaLista() {
         const n = document.getElementById('novaListaNome').value.trim();
-        if(n) { appData.listas[n] = []; salvar(); renderHome(); abrirLista(n); document.getElementById('novaListaNome').value = ""; }
+        if (n) {
+            appData.listas[n] = [];
+            salvar();
+            renderHome();
+            abrirLista(n);
+            document.getElementById('novaListaNome').value = "";
+        }
     }
 
     function abrirLista(id) {
@@ -217,95 +549,195 @@
         document.getElementById('screenHome').classList.remove('active');
         document.getElementById('screenEditor').classList.add('active');
         document.getElementById('tituloListaAtual').innerText = id;
-        document.getElementById('prodCatSelect').innerHTML = appData.categorias.map(c => `<option value="${c}">${c}</option>`).join('');
+        document.getElementById('prodCatSelect').innerHTML = appData.categorias.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
         renderItens();
     }
 
     function adicionarItem() {
-        const nome = document.getElementById('prodNome').value;
-        if(!nome) return;
+        const nome = document.getElementById('prodNome').value.trim();
+        if (!nome) return;
+
         appData.listas[listaAtiva].push({
-            nome, ean: document.getElementById('prodEan').value, cat: document.getElementById('prodCatSelect').value,
+            nome,
+            ean: somenteDigitos(document.getElementById('prodEan').value),
+            cat: document.getElementById('prodCatSelect').value,
             qtdP: parseFloat(document.getElementById('prodQtdP').value) || 1,
             valP: parseFloat(document.getElementById('prodValP').value) || 0,
-            qtdR: parseFloat(document.getElementById('prodQtdP').value) || 1, valR: 0, noCarrinho: false
+            qtdR: parseFloat(document.getElementById('prodQtdP').value) || 1,
+            valR: 0,
+            noCarrinho: false
         });
-        salvar(); renderItens();
-        document.getElementById('prodNome').value = ""; document.getElementById('prodEan').value = "";
-        document.getElementById('prodValP').value = ""; document.getElementById('prodQtdP').value = "1";
+
+        salvar();
+        renderItens();
+
+        document.getElementById('prodNome').value = "";
+        document.getElementById('prodEan').value = "";
+        document.getElementById('prodValP').value = "";
+        document.getElementById('prodQtdP').value = "1";
     }
 
     function renderItens() {
-        const container = document.getElementById('corpoLista'); container.innerHTML = "";
+        const container = document.getElementById('corpoLista');
+        container.innerHTML = "";
+
         const itens = appData.listas[listaAtiva] || [];
-        const cats = [...new Set(itens.map(i => i.cat))];
-        cats.sort().forEach(cat => {
-            container.innerHTML += `<div class="category-header">${cat}</div>`;
+        const cats = [...new Set(itens.map(i => i.cat))].sort();
+
+        cats.forEach(cat => {
+            container.innerHTML += `<div class="category-header">${escapeHtml(cat)}</div>`;
+
             itens.filter(i => i.cat === cat).forEach(item => {
                 const idx = appData.listas[listaAtiva].indexOf(item);
-                container.innerHTML += `<div class="item-row">
-                    <div style="display:flex; justify-content:space-between; font-weight:bold;"><span>${item.nome}</span><span onclick="appData.listas[listaAtiva].splice(${idx},1);salvar();renderItens();" style="color:red">🗑️</span></div>
-                    <div class="calc-grid">
-                        <input type="checkbox" ${item.noCarrinho?'checked':''} onclick="appData.listas[listaAtiva][${idx}].noCarrinho=!appData.listas[listaAtiva][${idx}].noCarrinho;salvar();">
-                        <small>PREV</small><div>${item.qtdP}</div><div>${item.valP.toFixed(2)}</div><div style="text-align:right">${(item.qtdP*item.valP).toFixed(2)}</div>
+
+                container.innerHTML += `
+                    <div class="item-row">
+                        <div style="display:flex; justify-content:space-between; font-weight:bold;">
+                            <span>${escapeHtml(item.nome)}</span>
+                            <span onclick="appData.listas[listaAtiva].splice(${idx},1);salvar();renderItens();" style="color:red; cursor:pointer;">🗑️</span>
+                        </div>
+
+                        <div class="calc-grid">
+                            <input type="checkbox" ${item.noCarrinho ? 'checked' : ''} onclick="appData.listas[listaAtiva][${idx}].noCarrinho=!appData.listas[listaAtiva][${idx}].noCarrinho;salvar();">
+                            <small>PREV</small>
+                            <div>${item.qtdP}</div>
+                            <div>${formatarMoedaBr(item.valP)}</div>
+                            <div style="text-align:right">${formatarMoedaBr(item.qtdP * item.valP)}</div>
+                        </div>
+
+                        <div class="calc-grid" style="margin-top:5px;">
+                            <div></div>
+                            <small style="color:var(--s)">REAL</small>
+                            <input type="number" class="mini-input" value="${item.qtdR}" oninput="appData.listas[listaAtiva][${idx}].qtdR=parseFloat(this.value)||0;salvar();calcularTotais();renderItensParcialSemPiscar();">
+                            <input type="number" class="mini-input" value="${item.valR}" oninput="appData.listas[listaAtiva][${idx}].valR=parseFloat(this.value)||0;salvar();calcularTotais();renderItensParcialSemPiscar();">
+                            <div style="text-align:right; color:var(--s); font-weight:bold;">${formatarMoedaBr(item.qtdR * item.valR)}</div>
+                        </div>
                     </div>
-                    <div class="calc-grid" style="margin-top:5px;">
-                        <div></div><small style="color:var(--s)">REAL</small>
-                        <input type="number" class="mini-input" value="${item.qtdR}" oninput="appData.listas[listaAtiva][${idx}].qtdR=parseFloat(this.value)||0;salvar();calcularTotais();">
-                        <input type="number" class="mini-input" value="${item.valR}" oninput="appData.listas[listaAtiva][${idx}].valR=parseFloat(this.value)||0;salvar();calcularTotais();">
-                        <div style="text-align:right; color:var(--s); font-weight:bold;">${(item.qtdR*item.valR).toFixed(2)}</div>
-                    </div>
-                </div>`;
+                `;
             });
         });
+
         calcularTotais();
+    }
+
+    function renderItensParcialSemPiscar() {
+        const itens = appData.listas[listaAtiva] || [];
+        const linhas = document.querySelectorAll('.item-row');
+        itens.forEach((item, idx) => {
+            const totalReal = item.qtdR * item.valR;
+            if (linhas[idx]) {
+                const alvo = linhas[idx].querySelectorAll('.calc-grid')[1]?.querySelector('div:last-child');
+                if (alvo) alvo.textContent = formatarMoedaBr(totalReal);
+            }
+        });
     }
 
     function calcularTotais() {
         const itens = appData.listas[listaAtiva] || [];
         const tP = itens.reduce((acc, i) => acc + (i.qtdP * i.valP), 0);
         const tR = itens.reduce((acc, i) => acc + (i.qtdR * i.valR), 0);
-        document.getElementById('totalPrevisto').innerText = `R$ ${tP.toFixed(2)}`;
-        document.getElementById('totalReal').innerText = `R$ ${tR.toFixed(2)}`;
+
+        document.getElementById('totalPrevisto').innerText = `R$ ${formatarMoedaBr(tP)}`;
+        document.getElementById('totalReal').innerText = `R$ ${formatarMoedaBr(tR)}`;
     }
 
     function compartilharWhatsApp() {
-        const itens = appData.listas[listaAtiva];
+        const itens = appData.listas[listaAtiva] || [];
         let texto = `🛒 *LISTA: ${listaAtiva.toUpperCase()}*\n\n`;
-        itens.forEach(i => { texto += `${i.noCarrinho ? '✅' : '⬜'} *${i.nome}*\n   ${i.qtdR}x R$ ${i.valR.toFixed(2)} = *R$ ${(i.qtdR*i.valR).toFixed(2)}*\n`; });
+
+        itens.forEach(i => {
+            texto += `${i.noCarrinho ? '✅' : '⬜'} *${i.nome}*\n   ${i.qtdR}x R$ ${formatarMoedaBr(i.valR)} = *R$ ${formatarMoedaBr(i.qtdR * i.valR)}*\n`;
+        });
+
         texto += `\n💰 *TOTAL REAL: ${document.getElementById('totalReal').innerText}*`;
         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`);
     }
 
-    function abrirModalCatalogo() { 
-        document.getElementById('modalCatalogo').style.display='flex'; 
-        document.getElementById('catCatSelect').innerHTML = appData.categorias.map(c => `<option value="${c}">${c}</option>`).join('');
-        renderCatalogo(); 
-    }
-    function fecharModalCatalogo() { document.getElementById('modalCatalogo').style.display='none'; }
-    function salvarNoCatalogo() {
-        const ean = document.getElementById('catEan').value || "INT_"+Date.now();
-        appData.catalogo[ean] = { nome: document.getElementById('catNome').value, preco: parseFloat(document.getElementById('catPreco').value)||0, categoria: document.getElementById('catCatSelect').value };
-        salvar(); renderCatalogo();
-        document.getElementById('catEan').value = ""; document.getElementById('catNome').value = ""; document.getElementById('catPreco').value = "";
-    }
-    function renderCatalogo() {
-        document.getElementById('listaItensCatalogo').innerHTML = Object.keys(appData.catalogo).map(ean => `<div style="display:flex; justify-content:space-between; padding:5px; border-bottom:1px solid #eee"><span>${appData.catalogo[ean].nome}</span><b onclick="delete appData.catalogo['${ean}']; salvar(); renderCatalogo();" style="color:red">✕</b></div>`).join('');
+    function abrirModalCatalogo() {
+        document.getElementById('modalCatalogo').style.display = 'flex';
+        document.getElementById('catCatSelect').innerHTML = appData.categorias.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+        renderCatalogo();
     }
 
-    function abrirModalCats() { document.getElementById('modalCats').style.display='flex'; renderCatsList(); }
-    function renderCatsList() { document.getElementById('listaCategoriasEdicao').innerHTML = appData.categorias.map((c, i) => `<div style="padding:10px; border-bottom:1px solid #eee">${c}</div>`).join(''); }
-    function irParaHome() { document.getElementById('screenEditor').classList.remove('active'); document.getElementById('screenHome').classList.add('active'); renderHome(); }
+    function fecharModalCatalogo() {
+        document.getElementById('modalCatalogo').style.display = 'none';
+    }
+
+    function salvarNoCatalogo() {
+        const eanDigitado = somenteDigitos(document.getElementById('catEan').value);
+        const ean = (eanDigitado.length === 8 || eanDigitado.length === 13) ? eanDigitado : ("INT_" + Date.now());
+
+        appData.catalogo[ean] = {
+            nome: document.getElementById('catNome').value.trim(),
+            preco: parseFloat(document.getElementById('catPreco').value) || 0,
+            categoria: document.getElementById('catCatSelect').value
+        };
+
+        salvar();
+        renderCatalogo();
+
+        document.getElementById('catEan').value = "";
+        document.getElementById('catNome').value = "";
+        document.getElementById('catPreco').value = "";
+    }
+
+    function renderCatalogo() {
+        document.getElementById('listaItensCatalogo').innerHTML = Object.keys(appData.catalogo).map(ean => `
+            <div style="display:flex; justify-content:space-between; padding:5px; border-bottom:1px solid #eee; gap:10px;">
+                <span style="flex:1;">${escapeHtml(appData.catalogo[ean].nome || '')}</span>
+                <b onclick="delete appData.catalogo['${ean}']; salvar(); renderCatalogo();" style="color:red; cursor:pointer;">✕</b>
+            </div>
+        `).join('');
+    }
+
+    function abrirModalCats() {
+        document.getElementById('modalCats').style.display = 'flex';
+        renderCatsList();
+    }
+
+    function renderCatsList() {
+        document.getElementById('listaCategoriasEdicao').innerHTML =
+            appData.categorias.map(c => `<div style="padding:10px; border-bottom:1px solid #eee">${escapeHtml(c)}</div>`).join('');
+    }
+
+    function irParaHome() {
+        pararLeitor(true);
+        document.getElementById('screenEditor').classList.remove('active');
+        document.getElementById('screenHome').classList.add('active');
+        renderHome();
+    }
+
     function renderHome() {
         document.getElementById('listaDeArquivos').innerHTML = Object.keys(appData.listas).map(id => `
-            <div style="background:#fff; border:1px solid #ddd; padding:15px; border-radius:12px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center">
-                <b onclick="abrirLista('${id}')" style="flex:1">${id}</b>
-                <span onclick="if(confirm('Apagar lista?')){delete appData.listas['${id}']; salvar(); renderHome();}" style="color:red; margin-left:15px">🗑️</span>
-            </div>`).join('');
+            <div style="background:#fff; border:1px solid #ddd; padding:15px; border-radius:12px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; gap:12px;">
+                <b onclick="abrirLista(${JSON.stringify(id)})" style="flex:1; cursor:pointer;">${escapeHtml(id)}</b>
+                <span onclick="if(confirm('Apagar lista?')){delete appData.listas[${JSON.stringify(id)}]; salvar(); renderHome();}" style="color:red; margin-left:15px; cursor:pointer;">🗑️</span>
+            </div>
+        `).join('');
     }
 
-    function exportarBackup() { prompt("Backup:", btoa(unescape(encodeURIComponent(JSON.stringify(appData))))); }
-    function importarBackup() { const b = prompt("Cole o Backup:"); if(b){ try{appData=JSON.parse(decodeURIComponent(escape(atob(b)))); salvar(); location.reload();}catch(e){alert("Erro!");} }}
+    function exportarBackup() {
+        prompt("Backup:", btoa(unescape(encodeURIComponent(JSON.stringify(appData)))));
+    }
+
+    function importarBackup() {
+        const b = prompt("Cole o Backup:");
+        if (b) {
+            try {
+                appData = JSON.parse(decodeURIComponent(escape(atob(b))));
+                appData.listas = appData.listas || {};
+                appData.catalogo = appData.catalogo || {};
+                appData.categorias = Array.isArray(appData.categorias) && appData.categorias.length ? appData.categorias : [...CATS_PADRAO];
+                salvar();
+                location.reload();
+            } catch (e) {
+                alert("Erro!");
+            }
+        }
+    }
+
+    window.addEventListener('pagehide', () => pararLeitor(true));
+    window.addEventListener('beforeunload', () => pararLeitor(true));
 
     renderHome();
     atualizarDatalist();
