@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lista de Compras - Supermercado - Jrcollo - V39</title>
+    <title>Lista de Compras - Supermercado - Jrcollo - V40</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
     <style>
         :root {
@@ -339,6 +339,25 @@
             color: #64748b;
             margin-top: 6px;
         }
+
+        .print-option-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid #eef2f7;
+        }
+
+        .print-option-row input[type="checkbox"] {
+            width: auto;
+            margin: 3px 0 0 0;
+        }
+
+        .print-option-row label {
+            flex: 1;
+            margin: 0;
+            line-height: 1.35;
+        }
     </style>
 </head>
 <body>
@@ -370,7 +389,7 @@
         <div class="header-row">
             <button type="button" class="btn" onclick="irParaHome()">←</button>
             <h3 id="tituloListaAtual"></h3>
-            <button type="button" class="btn btn-muted" onclick="imprimirLista()" style="width:auto;">🖨️ Imprimir</button>
+            <button type="button" class="btn btn-muted" onclick="abrirModalImpressao()" style="width:auto;">🖨️ Imprimir</button>
             <button type="button" class="btn btn-muted" onclick="renomearListaAtiva()" style="width:auto;">✏️ Renomear Lista</button>
         </div>
 
@@ -509,6 +528,53 @@
     </div>
 </div>
 
+<div id="modalImpressao" class="modal">
+    <div class="modal-content">
+        <h3>🖨️ Opções de Impressão</h3>
+
+        <div class="print-option-row">
+            <input type="checkbox" id="printOnlyNameQty">
+            <label for="printOnlyNameQty">
+                <strong>Somente nome e quantidade</strong><br>
+                Imprime apenas produto e quantidade prevista.
+            </label>
+        </div>
+
+        <div class="print-option-row">
+            <input type="checkbox" id="printHideValues">
+            <label for="printHideValues">
+                <strong>Sem valores</strong><br>
+                Remove as colunas de preço e total.
+            </label>
+        </div>
+
+        <div class="print-option-row">
+            <input type="checkbox" id="printLargeChecks">
+            <label for="printLargeChecks">
+                <strong>Caixas maiores para marcar</strong><br>
+                Aumenta a área de marcação na impressão.
+            </label>
+        </div>
+
+        <div class="print-option-row" style="border-bottom:none;">
+            <input type="checkbox" id="printCompactMode">
+            <label for="printCompactMode">
+                <strong>Modo econômico / compacto</strong><br>
+                Reduz espaçamento para caber mais itens por página.
+            </label>
+        </div>
+
+        <div class="small-note" style="margin:10px 0 14px 0;">
+            Observação: “Somente nome e quantidade” já oculta os valores automaticamente.
+        </div>
+
+        <div class="action-grid-2">
+            <button type="button" class="btn btn-p" onclick="executarImpressao()">Imprimir</button>
+            <button type="button" class="btn btn-muted" onclick="fecharModalImpressao()">Cancelar</button>
+        </div>
+    </div>
+</div>
+
 <div id="processingOverlay" class="processing-overlay">
     <div class="processing-box">
         <h3 style="margin-top:0;">Processando imagem</h3>
@@ -536,7 +602,7 @@
 
     function defaultData() {
         return {
-            version: 39,
+            version: 40,
             listas: {},
             categorias: [...CATS_PADRAO],
             catalogo: {}
@@ -603,6 +669,7 @@
 
     let appData = carregarDados();
     let listaAtiva = null;
+    let listaParaImpressao = null;
 
     let scannerAlvo = 'lista';
     let scannerRodando = false;
@@ -776,7 +843,37 @@
         ];
     }
 
-    function imprimirLista(nomeLista = listaAtiva) {
+    function abrirModalImpressao(nomeLista = listaAtiva) {
+        if (!nomeLista || !appData.listas[nomeLista]) {
+            alert('Lista não encontrada.');
+            return;
+        }
+
+        listaParaImpressao = nomeLista;
+        document.getElementById('printOnlyNameQty').checked = false;
+        document.getElementById('printHideValues').checked = false;
+        document.getElementById('printLargeChecks').checked = false;
+        document.getElementById('printCompactMode').checked = false;
+        document.getElementById('modalImpressao').style.display = 'flex';
+    }
+
+    function fecharModalImpressao() {
+        document.getElementById('modalImpressao').style.display = 'none';
+    }
+
+    function executarImpressao() {
+        const opcoes = {
+            onlyNameQty: !!document.getElementById('printOnlyNameQty').checked,
+            hideValues: !!document.getElementById('printHideValues').checked,
+            largeChecks: !!document.getElementById('printLargeChecks').checked,
+            compactMode: !!document.getElementById('printCompactMode').checked
+        };
+
+        fecharModalImpressao();
+        imprimirListaComOpcoes(listaParaImpressao, opcoes);
+    }
+
+    function imprimirListaComOpcoes(nomeLista = listaAtiva, opcoes = {}) {
         if (!nomeLista || !appData.listas[nomeLista]) {
             alert('Lista não encontrada.');
             return;
@@ -790,9 +887,28 @@
             return;
         }
 
+        const onlyNameQty = !!opcoes.onlyNameQty;
+        const hideValues = !!opcoes.hideValues || onlyNameQty;
+        const largeChecks = !!opcoes.largeChecks;
+        const compactMode = !!opcoes.compactMode;
+
         const categoriasOrdenadas = obterCategoriasOrdenadasDaLista(nomeLista);
         const totalPrevisto = itens.reduce((acc, i) => acc + ((parseFloat(i.qtdP) || 0) * (parseFloat(i.valP) || 0)), 0);
         const dataAtual = new Date().toLocaleString('pt-BR');
+
+        const colunasHead = hideValues
+            ? `
+                <th class="check-col">OK</th>
+                <th>Produto</th>
+                <th class="num">Qtd</th>
+              `
+            : `
+                <th class="check-col">OK</th>
+                <th>Produto</th>
+                <th class="num">Qtd</th>
+                <th class="num">Valor</th>
+                <th class="num">Total</th>
+              `;
 
         let blocosCategorias = '';
 
@@ -800,15 +916,27 @@
             const itensDaCategoria = itens.filter(i => (i.cat || "📦 Outros") === cat);
             if (!itensDaCategoria.length) return;
 
-            const linhas = itensDaCategoria.map(item => `
-                <tr>
-                    <td class="check-col">☐</td>
-                    <td>${escapeHtml(item.nome || '')}</td>
-                    <td class="num">${parseFloat(item.qtdP) || 0}</td>
-                    <td class="num">R$ ${formatarMoeda(item.valP)}</td>
-                    <td class="num">R$ ${formatarMoeda((parseFloat(item.qtdP) || 0) * (parseFloat(item.valP) || 0))}</td>
-                </tr>
-            `).join('');
+            const linhas = itensDaCategoria.map(item => {
+                if (hideValues) {
+                    return `
+                        <tr>
+                            <td class="check-col">${largeChecks ? '□' : '☐'}</td>
+                            <td>${escapeHtml(item.nome || '')}</td>
+                            <td class="num">${parseFloat(item.qtdP) || 0}</td>
+                        </tr>
+                    `;
+                }
+
+                return `
+                    <tr>
+                        <td class="check-col">${largeChecks ? '□' : '☐'}</td>
+                        <td>${escapeHtml(item.nome || '')}</td>
+                        <td class="num">${parseFloat(item.qtdP) || 0}</td>
+                        <td class="num">R$ ${formatarMoeda(item.valP)}</td>
+                        <td class="num">R$ ${formatarMoeda((parseFloat(item.qtdP) || 0) * (parseFloat(item.valP) || 0))}</td>
+                    </tr>
+                `;
+            }).join('');
 
             blocosCategorias += `
                 <div class="categoria-bloco">
@@ -816,11 +944,7 @@
                     <table>
                         <thead>
                             <tr>
-                                <th class="check-col">OK</th>
-                                <th>Produto</th>
-                                <th class="num">Qtd</th>
-                                <th class="num">Valor</th>
-                                <th class="num">Total</th>
+                                ${colunasHead}
                             </tr>
                         </thead>
                         <tbody>
@@ -857,15 +981,15 @@
                         font-size: 13px;
                     }
                     .categoria-bloco {
-                        margin-bottom: 18px;
+                        margin-bottom: ${compactMode ? '10px' : '18px'};
                         page-break-inside: avoid;
                     }
                     .categoria-titulo {
                         font-weight: bold;
-                        font-size: 14px;
+                        font-size: ${compactMode ? '12px' : '14px'};
                         text-transform: uppercase;
                         background: #f3f4f6;
-                        padding: 8px 10px;
+                        padding: ${compactMode ? '6px 8px' : '8px 10px'};
                         border-radius: 6px;
                         color: #374151;
                         margin-bottom: 8px;
@@ -877,8 +1001,8 @@
                     }
                     th, td {
                         border: 1px solid #d1d5db;
-                        padding: 8px;
-                        font-size: 13px;
+                        padding: ${compactMode ? '5px 6px' : '8px'};
+                        font-size: ${compactMode ? '11px' : '13px'};
                     }
                     th {
                         background: #f9fafb;
@@ -889,14 +1013,16 @@
                         white-space: nowrap;
                     }
                     .check-col {
-                        width: 42px;
+                        width: ${largeChecks ? '64px' : compactMode ? '38px' : '42px'};
                         text-align: center;
+                        font-size: ${largeChecks ? '22px' : compactMode ? '13px' : '16px'};
+                        line-height: 1;
                     }
                     .rodape {
                         margin-top: 24px;
                         padding-top: 12px;
                         border-top: 2px solid #e5e7eb;
-                        font-size: 14px;
+                        font-size: ${compactMode ? '12px' : '14px'};
                         font-weight: bold;
                         text-align: right;
                     }
@@ -917,7 +1043,7 @@
                 ${blocosCategorias}
 
                 <div class="rodape">
-                    Total Previsto: R$ ${formatarMoeda(totalPrevisto)}
+                    ${hideValues ? '' : `Total Previsto: R$ ${formatarMoeda(totalPrevisto)}`}
                 </div>
 
                 <script>
@@ -1856,7 +1982,7 @@
                         <div><b>${escapeHtml(id)}</b></div>
                         <div class="list-meta">${qtd} item(ns)</div>
                     </div>
-                    <button type="button" class="icon-btn" onclick='imprimirLista(${JSON.stringify(id)})'>🖨️</button>
+                    <button type="button" class="icon-btn" onclick='abrirModalImpressao(${JSON.stringify(id)})'>🖨️</button>
                     <button type="button" class="icon-btn" onclick='renomearLista(${JSON.stringify(id)})'>✏️</button>
                     <button type="button" class="icon-btn danger" onclick='excluirLista(${JSON.stringify(id)})'>🗑️</button>
                 </div>
