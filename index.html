@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lista de Compras - Supermercado - Jrcollo - V40</title>
+    <title>Lista de Compras - Supermercado - Jrcollo - V41</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
     <style>
         :root {
@@ -98,7 +98,7 @@
             border-radius: 12px;
             margin-bottom: 10px;
             display: grid;
-            grid-template-columns: 1fr auto auto auto;
+            grid-template-columns: 1fr auto auto auto auto;
             gap: 8px;
             align-items: center;
         }
@@ -216,7 +216,7 @@
         .modal-content {
             background: #fff;
             width: 92%;
-            max-width: 500px;
+            max-width: 560px;
             padding: 20px;
             border-radius: 15px;
             max-height: 88vh;
@@ -358,6 +358,34 @@
             margin: 0;
             line-height: 1.35;
         }
+
+        .cat-edit-row {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .cat-edit-row input {
+            margin-bottom: 0;
+        }
+
+        .search-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        .search-row input {
+            margin-bottom: 0;
+        }
+
+        .item-row.done-item {
+            opacity: 0.72;
+        }
     </style>
 </head>
 <body>
@@ -474,7 +502,12 @@
 
         <button type="button" class="btn btn-p" onclick="salvarNoCatalogo()">Salvar Item</button>
 
-        <div id="listaItensCatalogo" style="margin-top:15px; max-height:300px; overflow-y:auto;"></div>
+        <div class="search-row">
+            <input type="text" id="catalogoBusca" placeholder="Pesquisar no catálogo" oninput="renderCatalogo()">
+            <button type="button" class="btn btn-muted" onclick="limparBuscaCatalogo()" style="width:auto;">Limpar</button>
+        </div>
+
+        <div id="listaItensCatalogo" style="margin-top:10px; max-height:300px; overflow-y:auto;"></div>
 
         <button type="button" class="btn" style="width:100%; margin-top:10px; background:#ddd" onclick="fecharModalCatalogo()">Fechar</button>
     </div>
@@ -483,7 +516,14 @@
 <div id="modalCats" class="modal">
     <div class="modal-content">
         <h3>⚙️ Categorias</h3>
+
+        <div class="search-row" style="margin-top:0;">
+            <input type="text" id="novaCategoriaInput" placeholder="Nova categoria">
+            <button type="button" class="btn btn-p" onclick="adicionarCategoria()" style="width:auto;">Adicionar</button>
+        </div>
+
         <div id="listaCategoriasEdicao"></div>
+
         <button type="button" class="btn" style="width:100%; margin-top:15px; background:#ddd" onclick="document.getElementById('modalCats').style.display='none'">Fechar</button>
     </div>
 </div>
@@ -602,7 +642,7 @@
 
     function defaultData() {
         return {
-            version: 40,
+            version: 41,
             listas: {},
             categorias: [...CATS_PADRAO],
             catalogo: {}
@@ -793,6 +833,13 @@
         el.innerHTML = appData.categorias.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
     }
 
+    function atualizarSelectsCategoriasAbertos() {
+        preencherSelectCategorias('prodCatSelect');
+        preencherSelectCategorias('catCatSelect');
+        preencherSelectCategorias('editCatCategoria');
+        preencherSelectCategorias('editItemCategoria');
+    }
+
     function ordenarListaPorCategoriaENome(nomeLista) {
         if (!nomeLista || !appData.listas[nomeLista]) return;
 
@@ -811,6 +858,10 @@
             if (idxB === -1) idxB = 9999;
 
             if (idxA !== idxB) return idxA - idxB;
+
+            const doneA = a.noCarrinho ? 1 : 0;
+            const doneB = b.noCarrinho ? 1 : 0;
+            if (doneA !== doneB) return doneA - doneB;
 
             return String(a.nome || '').localeCompare(String(b.nome || ''), 'pt-BR');
         });
@@ -1064,6 +1115,149 @@
         janela.document.open();
         janela.document.write(html);
         janela.document.close();
+    }
+
+    function limparBuscaCatalogo() {
+        document.getElementById('catalogoBusca').value = '';
+        renderCatalogo();
+    }
+
+    function adicionarCategoria() {
+        const nome = document.getElementById('novaCategoriaInput').value.trim();
+        if (!nome) return;
+
+        if (appData.categorias.some(c => c.toLowerCase() === nome.toLowerCase())) {
+            alert('Já existe uma categoria com esse nome.');
+            return;
+        }
+
+        appData.categorias.push(nome);
+        ordenarTodasListas();
+        salvar();
+        document.getElementById('novaCategoriaInput').value = '';
+        atualizarSelectsCategoriasAbertos();
+        renderCatsList();
+        renderCatalogo();
+        if (listaAtiva) renderItens();
+    }
+
+    function salvarCategoria(idx) {
+        const input = document.getElementById(`catEdit_${idx}`);
+        if (!input) return;
+
+        const novoNome = input.value.trim();
+        const nomeAntigo = appData.categorias[idx];
+
+        if (!novoNome) {
+            alert('Informe um nome para a categoria.');
+            return;
+        }
+
+        if (novoNome !== nomeAntigo && appData.categorias.some((c, i) => i !== idx && c.toLowerCase() === novoNome.toLowerCase())) {
+            alert('Já existe outra categoria com esse nome.');
+            return;
+        }
+
+        if (novoNome === nomeAntigo) return;
+
+        appData.categorias[idx] = novoNome;
+
+        Object.keys(appData.catalogo).forEach(ean => {
+            if ((appData.catalogo[ean].categoria || '') === nomeAntigo) {
+                appData.catalogo[ean].categoria = novoNome;
+            }
+        });
+
+        Object.keys(appData.listas).forEach(nomeLista => {
+            appData.listas[nomeLista].forEach(item => {
+                if ((item.cat || '') === nomeAntigo) {
+                    item.cat = novoNome;
+                }
+            });
+        });
+
+        ordenarTodasListas();
+        salvar();
+        atualizarSelectsCategoriasAbertos();
+        renderCatsList();
+        renderCatalogo();
+        if (listaAtiva) renderItens();
+    }
+
+    function excluirCategoria(idx) {
+        if (appData.categorias.length <= 1) {
+            alert('É necessário manter pelo menos uma categoria.');
+            return;
+        }
+
+        const nomeAntigo = appData.categorias[idx];
+        const categoriasRestantes = appData.categorias.filter((_, i) => i !== idx);
+        const categoriaDestino = categoriasRestantes[0] || "📦 Outros";
+
+        if (!confirm(`Excluir a categoria "${nomeAntigo}"?\nOs itens dela serão movidos para "${categoriaDestino}".`)) return;
+
+        appData.categorias.splice(idx, 1);
+
+        Object.keys(appData.catalogo).forEach(ean => {
+            if ((appData.catalogo[ean].categoria || '') === nomeAntigo) {
+                appData.catalogo[ean].categoria = categoriaDestino;
+            }
+        });
+
+        Object.keys(appData.listas).forEach(nomeLista => {
+            appData.listas[nomeLista].forEach(item => {
+                if ((item.cat || '') === nomeAntigo) {
+                    item.cat = categoriaDestino;
+                }
+            });
+        });
+
+        ordenarTodasListas();
+        salvar();
+        atualizarSelectsCategoriasAbertos();
+        renderCatsList();
+        renderCatalogo();
+        if (listaAtiva) renderItens();
+    }
+
+    function renderCatsList() {
+        document.getElementById('listaCategoriasEdicao').innerHTML =
+            appData.categorias.map((c, i) => `
+                <div class="cat-edit-row">
+                    <input type="text" id="catEdit_${i}" value="${escapeHtml(c)}">
+                    <button type="button" class="btn btn-muted" onclick="salvarCategoria(${i})" style="width:auto;">Salvar</button>
+                    <button type="button" class="btn btn-danger" onclick="excluirCategoria(${i})" style="width:auto;">✕</button>
+                </div>
+            `).join('');
+    }
+
+    function duplicarLista(id) {
+        if (!appData.listas[id]) return;
+
+        const sugestao = `${id} (Cópia)`;
+        const novoNome = prompt('Nome da nova cópia da lista:', sugestao);
+
+        if (!novoNome) return;
+        const nomeFinal = novoNome.trim();
+        if (!nomeFinal) return;
+
+        if (appData.listas[nomeFinal]) {
+            alert('Já existe uma lista com esse nome.');
+            return;
+        }
+
+        appData.listas[nomeFinal] = JSON.parse(JSON.stringify(appData.listas[id]));
+        ordenarListaPorCategoriaENome(nomeFinal);
+        salvar();
+        renderHome();
+    }
+
+    function alternarNoCarrinho(idx) {
+        if (!listaAtiva || !appData.listas[listaAtiva] || !appData.listas[listaAtiva][idx]) return;
+        appData.listas[listaAtiva][idx].noCarrinho = !appData.listas[listaAtiva][idx].noCarrinho;
+        ordenarListaAtivaPorCategoriaENome();
+        salvar();
+        renderItens();
     }
 
     function registrarCandidato(code, proporcao = 1, hitsNecessarios = 2) {
@@ -1762,7 +1956,7 @@
 
             itensDaCategoria.forEach(({ item, idx }) => {
                 container.innerHTML += `
-                    <div class="item-row">
+                    <div class="item-row ${item.noCarrinho ? 'done-item' : ''}">
                         <div class="item-top">
                             <div>
                                 <div class="item-title">${escapeHtml(item.nome)}</div>
@@ -1775,7 +1969,7 @@
                         </div>
 
                         <div class="calc-grid">
-                            <input type="checkbox" ${item.noCarrinho ? 'checked' : ''} onclick="appData.listas[listaAtiva][${idx}].noCarrinho=!appData.listas[listaAtiva][${idx}].noCarrinho;salvar();">
+                            <input type="checkbox" ${item.noCarrinho ? 'checked' : ''} onclick="alternarNoCarrinho(${idx})">
                             <small>PREV</small>
                             <div>${item.qtdP}</div>
                             <div>${formatarMoeda(item.valP)}</div>
@@ -1937,7 +2131,15 @@
     }
 
     function renderCatalogo() {
-        const catalogoOrdenado = obterCatalogoOrdenado();
+        const termo = (document.getElementById('catalogoBusca')?.value || '').trim().toLowerCase();
+
+        const catalogoOrdenado = obterCatalogoOrdenado().filter(({ ean, item }) => {
+            if (!termo) return true;
+            const nome = String(item?.nome || '').toLowerCase();
+            const categoria = String(item?.categoria || '').toLowerCase();
+            const codigo = String(ean || '').toLowerCase();
+            return nome.includes(termo) || categoria.includes(termo) || codigo.includes(termo);
+        });
 
         const html = catalogoOrdenado.map(({ ean, item }) => `
             <div class="catalog-card">
@@ -1953,17 +2155,12 @@
         `).join('');
 
         document.getElementById('listaItensCatalogo').innerHTML =
-            html || `<div class="catalog-meta">Nenhum produto cadastrado ainda.</div>`;
+            html || `<div class="catalog-meta">Nenhum produto encontrado.</div>`;
     }
 
     function abrirModalCats() {
         document.getElementById('modalCats').style.display = 'flex';
         renderCatsList();
-    }
-
-    function renderCatsList() {
-        document.getElementById('listaCategoriasEdicao').innerHTML =
-            appData.categorias.map(c => `<div style="padding:10px; border-bottom:1px solid #eee">${escapeHtml(c)}</div>`).join('');
     }
 
     function irParaHome() {
@@ -1983,6 +2180,7 @@
                         <div class="list-meta">${qtd} item(ns)</div>
                     </div>
                     <button type="button" class="icon-btn" onclick='abrirModalImpressao(${JSON.stringify(id)})'>🖨️</button>
+                    <button type="button" class="icon-btn" onclick='duplicarLista(${JSON.stringify(id)})'>📄</button>
                     <button type="button" class="icon-btn" onclick='renomearLista(${JSON.stringify(id)})'>✏️</button>
                     <button type="button" class="icon-btn danger" onclick='excluirLista(${JSON.stringify(id)})'>🗑️</button>
                 </div>
@@ -2029,6 +2227,7 @@
     salvar();
     renderHome();
     atualizarDatalist();
+    atualizarSelectsCategoriasAbertos();
 </script>
 </body>
 </html>
