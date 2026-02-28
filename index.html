@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lista de Compras - Supermercado - Jrcollo - V38</title>
+    <title>Lista de Compras - Supermercado - Jrcollo - V39</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
     <style>
         :root {
@@ -83,6 +83,7 @@
             align-items: center;
             gap: 8px;
             margin-bottom: 15px;
+            flex-wrap: wrap;
         }
 
         .header-row h3, .header-row h2 {
@@ -97,7 +98,7 @@
             border-radius: 12px;
             margin-bottom: 10px;
             display: grid;
-            grid-template-columns: 1fr auto auto;
+            grid-template-columns: 1fr auto auto auto;
             gap: 8px;
             align-items: center;
         }
@@ -369,6 +370,7 @@
         <div class="header-row">
             <button type="button" class="btn" onclick="irParaHome()">←</button>
             <h3 id="tituloListaAtual"></h3>
+            <button type="button" class="btn btn-muted" onclick="imprimirLista()" style="width:auto;">🖨️ Imprimir</button>
             <button type="button" class="btn btn-muted" onclick="renomearListaAtiva()" style="width:auto;">✏️ Renomear Lista</button>
         </div>
 
@@ -534,7 +536,7 @@
 
     function defaultData() {
         return {
-            version: 38,
+            version: 39,
             listas: {},
             categorias: [...CATS_PADRAO],
             catalogo: {}
@@ -756,6 +758,186 @@
         Object.keys(appData.listas || {}).forEach(nomeLista => {
             ordenarListaPorCategoriaENome(nomeLista);
         });
+    }
+
+    function obterCategoriasOrdenadasDaLista(nomeLista) {
+        const itens = appData.listas[nomeLista] || [];
+        const ordemCategorias = Array.isArray(appData.categorias) && appData.categorias.length
+            ? appData.categorias
+            : ["📦 Outros"];
+
+        const categoriasNaLista = [...new Set(itens.map(i => i.cat || "📦 Outros"))];
+
+        return [
+            ...ordemCategorias.filter(cat => categoriasNaLista.includes(cat)),
+            ...categoriasNaLista
+                .filter(cat => !ordemCategorias.includes(cat))
+                .sort((a, b) => String(a).localeCompare(String(b), 'pt-BR'))
+        ];
+    }
+
+    function imprimirLista(nomeLista = listaAtiva) {
+        if (!nomeLista || !appData.listas[nomeLista]) {
+            alert('Lista não encontrada.');
+            return;
+        }
+
+        ordenarListaPorCategoriaENome(nomeLista);
+
+        const itens = appData.listas[nomeLista] || [];
+        if (!itens.length) {
+            alert('A lista está vazia.');
+            return;
+        }
+
+        const categoriasOrdenadas = obterCategoriasOrdenadasDaLista(nomeLista);
+        const totalPrevisto = itens.reduce((acc, i) => acc + ((parseFloat(i.qtdP) || 0) * (parseFloat(i.valP) || 0)), 0);
+        const dataAtual = new Date().toLocaleString('pt-BR');
+
+        let blocosCategorias = '';
+
+        categoriasOrdenadas.forEach(cat => {
+            const itensDaCategoria = itens.filter(i => (i.cat || "📦 Outros") === cat);
+            if (!itensDaCategoria.length) return;
+
+            const linhas = itensDaCategoria.map(item => `
+                <tr>
+                    <td class="check-col">☐</td>
+                    <td>${escapeHtml(item.nome || '')}</td>
+                    <td class="num">${parseFloat(item.qtdP) || 0}</td>
+                    <td class="num">R$ ${formatarMoeda(item.valP)}</td>
+                    <td class="num">R$ ${formatarMoeda((parseFloat(item.qtdP) || 0) * (parseFloat(item.valP) || 0))}</td>
+                </tr>
+            `).join('');
+
+            blocosCategorias += `
+                <div class="categoria-bloco">
+                    <div class="categoria-titulo">${escapeHtml(cat)}</div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="check-col">OK</th>
+                                <th>Produto</th>
+                                <th class="num">Qtd</th>
+                                <th class="num">Valor</th>
+                                <th class="num">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${linhas}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        });
+
+        const html = `
+            <!DOCTYPE html>
+            <html lang="pt-br">
+            <head>
+                <meta charset="UTF-8">
+                <title>Imprimir Lista - ${escapeHtml(nomeLista)}</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        color: #111827;
+                        margin: 24px;
+                    }
+                    .topo {
+                        margin-bottom: 20px;
+                        border-bottom: 2px solid #e5e7eb;
+                        padding-bottom: 12px;
+                    }
+                    h1 {
+                        font-size: 24px;
+                        margin: 0 0 6px 0;
+                    }
+                    .sub {
+                        color: #6b7280;
+                        font-size: 13px;
+                    }
+                    .categoria-bloco {
+                        margin-bottom: 18px;
+                        page-break-inside: avoid;
+                    }
+                    .categoria-titulo {
+                        font-weight: bold;
+                        font-size: 14px;
+                        text-transform: uppercase;
+                        background: #f3f4f6;
+                        padding: 8px 10px;
+                        border-radius: 6px;
+                        color: #374151;
+                        margin-bottom: 8px;
+                    }
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-bottom: 8px;
+                    }
+                    th, td {
+                        border: 1px solid #d1d5db;
+                        padding: 8px;
+                        font-size: 13px;
+                    }
+                    th {
+                        background: #f9fafb;
+                        text-align: left;
+                    }
+                    .num {
+                        text-align: right;
+                        white-space: nowrap;
+                    }
+                    .check-col {
+                        width: 42px;
+                        text-align: center;
+                    }
+                    .rodape {
+                        margin-top: 24px;
+                        padding-top: 12px;
+                        border-top: 2px solid #e5e7eb;
+                        font-size: 14px;
+                        font-weight: bold;
+                        text-align: right;
+                    }
+                    @media print {
+                        body {
+                            margin: 12mm;
+                        }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="topo">
+                    <h1>🛒 Lista de Compras</h1>
+                    <div><strong>${escapeHtml(nomeLista)}</strong></div>
+                    <div class="sub">Gerado em: ${escapeHtml(dataAtual)}</div>
+                </div>
+
+                ${blocosCategorias}
+
+                <div class="rodape">
+                    Total Previsto: R$ ${formatarMoeda(totalPrevisto)}
+                </div>
+
+                <script>
+                    window.onload = function() {
+                        window.print();
+                    };
+                <\/script>
+            </body>
+            </html>
+        `;
+
+        const janela = window.open('', '_blank');
+        if (!janela) {
+            alert('O navegador bloqueou a janela de impressão. Libere pop-ups para este site.');
+            return;
+        }
+
+        janela.document.open();
+        janela.document.write(html);
+        janela.document.close();
     }
 
     function registrarCandidato(code, proporcao = 1, hitsNecessarios = 2) {
@@ -1674,6 +1856,7 @@
                         <div><b>${escapeHtml(id)}</b></div>
                         <div class="list-meta">${qtd} item(ns)</div>
                     </div>
+                    <button type="button" class="icon-btn" onclick='imprimirLista(${JSON.stringify(id)})'>🖨️</button>
                     <button type="button" class="icon-btn" onclick='renomearLista(${JSON.stringify(id)})'>✏️</button>
                     <button type="button" class="icon-btn danger" onclick='excluirLista(${JSON.stringify(id)})'>🗑️</button>
                 </div>
