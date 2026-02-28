@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lista de Compras - Supermercado - Jrcollo - V36</title>
+    <title>Lista de Compras - Supermercado - Jrcollo - V37</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
     <style>
         :root {
@@ -534,7 +534,7 @@
 
     function defaultData() {
         return {
-            version: 36,
+            version: 37,
             listas: {},
             categorias: [...CATS_PADRAO],
             catalogo: {}
@@ -693,6 +693,40 @@
         const el = document.getElementById(id);
         if (!el) return;
         el.innerHTML = appData.categorias.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+    }
+
+    function ordenarListaPorCategoriaENome(nomeLista) {
+        if (!nomeLista || !appData.listas[nomeLista]) return;
+
+        const ordemCategorias = Array.isArray(appData.categorias) && appData.categorias.length
+            ? appData.categorias
+            : ["📦 Outros"];
+
+        appData.listas[nomeLista].sort((a, b) => {
+            const catA = a.cat || "📦 Outros";
+            const catB = b.cat || "📦 Outros";
+
+            let idxA = ordemCategorias.indexOf(catA);
+            let idxB = ordemCategorias.indexOf(catB);
+
+            if (idxA === -1) idxA = 9999;
+            if (idxB === -1) idxB = 9999;
+
+            if (idxA !== idxB) return idxA - idxB;
+
+            return String(a.nome || '').localeCompare(String(b.nome || ''), 'pt-BR');
+        });
+    }
+
+    function ordenarListaAtivaPorCategoriaENome() {
+        if (!listaAtiva) return;
+        ordenarListaPorCategoriaENome(listaAtiva);
+    }
+
+    function ordenarTodasListas() {
+        Object.keys(appData.listas || {}).forEach(nomeLista => {
+            ordenarListaPorCategoriaENome(nomeLista);
+        });
     }
 
     function registrarCandidato(code, proporcao = 1, hitsNecessarios = 2) {
@@ -1239,6 +1273,8 @@
     function abrirLista(id) {
         if (!appData.listas[id]) return;
         listaAtiva = id;
+        ordenarListaPorCategoriaENome(id);
+        salvar();
         document.getElementById('screenHome').classList.remove('active');
         document.getElementById('screenEditor').classList.add('active');
         document.getElementById('tituloListaAtual').innerText = id;
@@ -1283,7 +1319,7 @@
         appData.listas[listaAtiva].push({
             nome,
             ean: somenteDigitos(document.getElementById('prodEan').value),
-            cat: document.getElementById('prodCatSelect').value,
+            cat: document.getElementById('prodCatSelect').value || "📦 Outros",
             qtdP: parseFloat(document.getElementById('prodQtdP').value) || 1,
             valP: parseFloat(document.getElementById('prodValP').value) || 0,
             qtdR: parseFloat(document.getElementById('prodQtdP').value) || 1,
@@ -1291,6 +1327,7 @@
             noCarrinho: false
         });
 
+        ordenarListaAtivaPorCategoriaENome();
         salvar();
         renderItens();
 
@@ -1333,7 +1370,7 @@
 
         item.ean = somenteDigitos(document.getElementById('editItemEan').value);
         item.nome = document.getElementById('editItemNome').value.trim();
-        item.cat = document.getElementById('editItemCategoria').value;
+        item.cat = document.getElementById('editItemCategoria').value || "📦 Outros";
         item.qtdP = parseFloat(document.getElementById('editItemQtdP').value) || 1;
         item.valP = parseFloat(document.getElementById('editItemValP').value) || 0;
         item.qtdR = parseFloat(document.getElementById('editItemQtdR').value) || 0;
@@ -1345,6 +1382,7 @@
             return;
         }
 
+        ordenarListaAtivaPorCategoriaENome();
         salvar();
         fecharModalEditarItem();
         renderItens();
@@ -1354,15 +1392,38 @@
         const container = document.getElementById('corpoLista');
         container.innerHTML = "";
 
-        const itens = appData.listas[listaAtiva] || [];
-        const cats = [...new Set(itens.map(i => i.cat || "📦 Outros"))].sort();
+        const itensOriginais = appData.listas[listaAtiva] || [];
+        if (!itensOriginais.length) {
+            calcularTotais();
+            return;
+        }
 
-        cats.forEach(cat => {
+        ordenarListaAtivaPorCategoriaENome();
+
+        const itensComIndice = appData.listas[listaAtiva].map((item, idx) => ({ item, idx }));
+
+        const ordemCategorias = Array.isArray(appData.categorias) && appData.categorias.length
+            ? appData.categorias
+            : ["📦 Outros"];
+
+        const categoriasNaLista = [...new Set(
+            itensComIndice.map(x => x.item.cat || "📦 Outros")
+        )];
+
+        const categoriasOrdenadas = [
+            ...ordemCategorias.filter(cat => categoriasNaLista.includes(cat)),
+            ...categoriasNaLista
+                .filter(cat => !ordemCategorias.includes(cat))
+                .sort((a, b) => String(a).localeCompare(String(b), 'pt-BR'))
+        ];
+
+        categoriasOrdenadas.forEach(cat => {
             container.innerHTML += `<div class="category-header">${escapeHtml(cat)}</div>`;
 
-            itens.forEach((item, idx) => {
-                if ((item.cat || "📦 Outros") !== cat) return;
+            const itensDaCategoria = itensComIndice
+                .filter(x => (x.item.cat || "📦 Outros") === cat);
 
+            itensDaCategoria.forEach(({ item, idx }) => {
                 container.innerHTML += `
                     <div class="item-row">
                         <div class="item-top">
@@ -1524,6 +1585,7 @@
             });
         });
 
+        ordenarTodasListas();
         salvar();
         fecharModalEditarCatalogo();
         renderCatalogo();
@@ -1615,6 +1677,7 @@
             const base = defaultData();
             appData = mergeAppData(base, appData);
             appData = mergeAppData(appData, dadoImportado);
+            ordenarTodasListas();
             salvar();
             location.reload();
         } catch(e) {
@@ -1625,6 +1688,8 @@
     window.addEventListener('pagehide', () => pararLeitor(true));
     window.addEventListener('beforeunload', () => pararLeitor(true));
 
+    ordenarTodasListas();
+    salvar();
     renderHome();
     atualizarDatalist();
 </script>
