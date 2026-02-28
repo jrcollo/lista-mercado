@@ -122,7 +122,6 @@
             color: #b91c1c;
         }
 
-        /* SCANNER */
         .modal-scanner {
             position: fixed;
             inset: 0;
@@ -203,7 +202,6 @@
             gap: 8px;
         }
 
-        /* MODAIS */
         .modal {
             position: fixed;
             inset: 0;
@@ -352,7 +350,7 @@
 
         <div style="display:flex; gap:8px; margin-bottom:20px;">
             <input type="text" id="novaListaNome" placeholder="Nome da Lista">
-            <button class="btn btn-p" onclick="criarNovaLista()" style="width:auto">Criar</button>
+            <button type="button" class="btn btn-p" onclick="criarNovaLista()" style="width:auto">Criar</button>
         </div>
 
         <div id="listaDeArquivos"></div>
@@ -360,24 +358,24 @@
         <hr style="margin:20px 0; opacity:0.1">
 
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-            <button class="btn btn-scan" onclick="abrirModalCatalogo()" style="grid-column: span 2;">📦 Catálogo de Produtos</button>
-            <button class="btn btn-muted" onclick="abrirModalCats()">⚙️ Categorias</button>
-            <button class="btn btn-muted" onclick="exportarBackup()">📤 Backup</button>
-            <button class="btn btn-muted" style="grid-column: span 2;" onclick="importarBackup()">📥 Restaurar Dados</button>
+            <button type="button" class="btn btn-scan" onclick="abrirModalCatalogo()" style="grid-column: span 2;">📦 Catálogo de Produtos</button>
+            <button type="button" class="btn btn-muted" onclick="abrirModalCats()">⚙️ Categorias</button>
+            <button type="button" class="btn btn-muted" onclick="exportarBackup()">📤 Backup</button>
+            <button type="button" class="btn btn-muted" style="grid-column: span 2;" onclick="importarBackup()">📥 Restaurar Dados</button>
         </div>
     </div>
 
     <div id="screenEditor" class="screen">
         <div class="header-row">
-            <button class="btn" onclick="irParaHome()">←</button>
+            <button type="button" class="btn" onclick="irParaHome()">←</button>
             <h3 id="tituloListaAtual"></h3>
-            <button class="btn btn-muted" onclick="renomearListaAtiva()" style="width:auto;">✏️ Renomear Lista</button>
+            <button type="button" class="btn btn-muted" onclick="renomearListaAtiva()" style="width:auto;">✏️ Renomear Lista</button>
         </div>
 
         <div style="background:#f8fafc; padding:15px; border-radius:12px; border:1px solid #e2e8f0; margin-bottom:15px;">
             <div class="action-grid-2">
-                <button class="btn btn-scan" onclick="iniciarLeitor('lista')">📸 Scanear Produto</button>
-                <button class="btn btn-photo" onclick="escolherFoto('lista')">🖼️ Ler Foto</button>
+                <button type="button" class="btn btn-scan" onclick="iniciarLeitor('lista')">📸 Scanear Produto</button>
+                <button type="button" class="btn btn-photo" onclick="escolherFoto('lista')">🖼️ Ler Foto</button>
             </div>
 
             <input
@@ -396,13 +394,13 @@
                 <select id="prodCatSelect"></select>
                 <input type="number" id="prodQtdP" value="1">
                 <input type="number" id="prodValP" placeholder="R$">
-                <button class="btn btn-p" onclick="adicionarItem()" style="grid-column: span 3;">Adicionar</button>
+                <button type="button" class="btn btn-p" onclick="adicionarItem()" style="grid-column: span 3;">Adicionar</button>
             </div>
         </div>
 
         <div id="corpoLista"></div>
 
-        <button class="btn btn-w" onclick="compartilharWhatsApp()">Finalizar e Enviar WhatsApp</button>
+        <button type="button" class="btn btn-w" onclick="compartilharWhatsApp()">Finalizar e Enviar WhatsApp</button>
 
         <div class="footer-summary">
             <div style="text-align:center;"><small>PREVISTO</small><br><b id="totalPrevisto">R$ 0.00</b></div>
@@ -421,8 +419,8 @@
         <div id="scannerStatus" class="scanner-status">Preparando câmera...</div>
 
         <div class="scanner-buttons">
-            <button id="btnTorch" class="btn btn-torch" onclick="alternarLanterna()" disabled>🔦 Lanterna</button>
-            <button class="btn" style="background:#ef4444; color:#fff;" onclick="pararLeitor()">Cancelar</button>
+            <button type="button" id="btnTorch" class="btn btn-torch" onclick="alternarLanterna()" disabled>🔦 Lanterna</button>
+            <button type="button" class="btn" style="background:#ef4444; color:#fff;" onclick="pararLeitor()">Cancelar</button>
         </div>
 
         <div class="small-note" style="color:#cbd5e1;">
@@ -436,8 +434,8 @@
         <h3>📦 Catálogo</h3>
 
         <div class="action-grid-2">
-            <button class="btn btn-scan" onclick="iniciarLeitor('catalogo')">📸 Scanear p/ Catálogo</button>
-            <button class="btn btn-photo" onclick="escolherFoto('catalogo')">🖼️ Ler Foto</button>
+            <button type="button" class="btn btn-scan" onclick="iniciarLeitor('catalogo')">📸 Scanear p/ Catálogo</button>
+            <button type="button" class="btn btn-photo" onclick="escolherFoto('catalogo')">🖼️ Ler Foto</button>
         </div>
 
         <input
@@ -453,11 +451,11 @@
         <select id="catCatSelect"></select>
         <input type="number" id="catPreco" placeholder="Preço R$">
 
-        <button class="btn btn-p" onclick="salvarNoCatalogo()">Salvar Item</button>
+        <button type="button" class="btn btn-p" onclick="salvarNoCatalogo()">Salvar Item</button>
 
         <div id="listaItensCatalogo" style="margin-top:15px; max-height:300px; overflow-y:auto;"></div>
 
-        <button class="btn" style="width:100%; margin-top:10px; background:#ddd" onclick="fecharModalCatalogo()">Fechar</button>
+        <button type="button" class="btn" style="width:100%; margin-top:10px; background:#ddd" onclick="fecharModalCatalogo()">Fechar</button>
     </div>
 </div>
 
@@ -465,7 +463,7 @@
     <div class="modal-content">
         <h3>⚙️ Categorias</h3>
         <div id="listaCategoriasEdicao"></div>
-        <button class="btn" style="width:100%; margin-top:15px; background:#ddd" onclick="document.getElementById('modalCats').style.display='none'">Fechar</button>
+        <button type="button" class="btn" style="width:100%; margin-top:15px; background:#ddd" onclick="document.getElementById('modalCats').style.display='none'">Fechar</button>
     </div>
 </div>
 
@@ -478,8 +476,8 @@
         <input type="number" id="editCatPreco" placeholder="Preço R$">
         <div class="small-note">Ao salvar, o app também atualiza itens das listas que usam este mesmo código.</div>
         <div class="action-grid-2" style="margin-top:12px;">
-            <button class="btn btn-p" onclick="salvarEdicaoCatalogo()">Salvar Alterações</button>
-            <button class="btn btn-muted" onclick="fecharModalEditarCatalogo()">Cancelar</button>
+            <button type="button" class="btn btn-p" onclick="salvarEdicaoCatalogo()">Salvar Alterações</button>
+            <button type="button" class="btn btn-muted" onclick="fecharModalEditarCatalogo()">Cancelar</button>
         </div>
     </div>
 </div>
@@ -503,8 +501,8 @@
             <label for="editItemNoCarrinho">Marcar como já colocado no carrinho</label>
         </div>
         <div class="action-grid-2">
-            <button class="btn btn-p" onclick="salvarEdicaoItem()">Salvar Alterações</button>
-            <button class="btn btn-muted" onclick="fecharModalEditarItem()">Cancelar</button>
+            <button type="button" class="btn btn-p" onclick="salvarEdicaoItem()">Salvar Alterações</button>
+            <button type="button" class="btn btn-muted" onclick="fecharModalEditarItem()">Cancelar</button>
         </div>
     </div>
 </div>
@@ -519,11 +517,8 @@
 <input id="photoInput" type="file" accept="image/*" style="display:none;">
 
 <script>
-    // IMPORTANTE:
-    // Não mude mais esta chave nas próximas versões.
     const STORAGE_KEY = 'jrcollo_lista_compras_storage';
 
-    // Chaves antigas para migração automática
     const LEGACY_KEYS = [
         'app_v29_storage',
         'app_v34_storage',
@@ -1376,8 +1371,8 @@
                                 <div class="catalog-meta">EAN: ${escapeHtml(item.ean || '-')} • Categoria: ${escapeHtml(item.cat || '📦 Outros')}</div>
                             </div>
                             <div class="item-actions">
-                                <button class="mini-icon" onclick="abrirEditarItem(${idx})">✏️</button>
-                                <button class="mini-icon danger" onclick="excluirItem(${idx})">🗑️</button>
+                                <button type="button" class="mini-icon" onclick="abrirEditarItem(${idx})">✏️</button>
+                                <button type="button" class="mini-icon danger" onclick="excluirItem(${idx})">🗑️</button>
                             </div>
                         </div>
 
@@ -1518,7 +1513,6 @@
         }
         appData.catalogo[novoEan] = produtoAtualizado;
 
-        // Atualiza também os itens das listas que usam esse produto
         Object.keys(appData.listas).forEach(nomeLista => {
             appData.listas[nomeLista].forEach(item => {
                 if ((item.ean || '') === editandoCatalogoEanOriginal || (item.ean || '') === novoEan) {
@@ -1554,13 +1548,14 @@
                             EAN: ${escapeHtml(ean)} • ${escapeHtml(item.categoria || '📦 Outros')} • R$ ${formatarMoeda(item.preco)}
                         </div>
                     </div>
-                    <button class="icon-btn" onclick="abrirEditarCatalogo(${JSON.stringify(ean)})">✏️</button>
-                    <button class="icon-btn danger" onclick="excluirDoCatalogo(${JSON.stringify(ean)})">🗑️</button>
+                    <button type="button" class="icon-btn" onclick='abrirEditarCatalogo(${JSON.stringify(ean)})'>✏️</button>
+                    <button type="button" class="icon-btn danger" onclick='excluirDoCatalogo(${JSON.stringify(ean)})'>🗑️</button>
                 </div>
             `;
         }).join('');
 
-        document.getElementById('listaItensCatalogo').innerHTML = html || `<div class="catalog-meta">Nenhum produto cadastrado ainda.</div>`;
+        document.getElementById('listaItensCatalogo').innerHTML =
+            html || `<div class="catalog-meta">Nenhum produto cadastrado ainda.</div>`;
     }
 
     function abrirModalCats() {
@@ -1585,17 +1580,18 @@
             const qtd = (appData.listas[id] || []).length;
             return `
                 <div class="list-card">
-                    <div onclick="abrirLista(${JSON.stringify(id)})" style="cursor:pointer;">
+                    <div onclick='abrirLista(${JSON.stringify(id)})' style="cursor:pointer;">
                         <div><b>${escapeHtml(id)}</b></div>
                         <div class="list-meta">${qtd} item(ns)</div>
                     </div>
-                    <button class="icon-btn" onclick="renomearLista(${JSON.stringify(id)})">✏️</button>
-                    <button class="icon-btn danger" onclick="excluirLista(${JSON.stringify(id)})">🗑️</button>
+                    <button type="button" class="icon-btn" onclick='renomearLista(${JSON.stringify(id)})'>✏️</button>
+                    <button type="button" class="icon-btn danger" onclick='excluirLista(${JSON.stringify(id)})'>🗑️</button>
                 </div>
             `;
         }).join('');
 
-        document.getElementById('listaDeArquivos').innerHTML = html || `<div class="list-meta">Nenhuma lista criada ainda.</div>`;
+        document.getElementById('listaDeArquivos').innerHTML =
+            html || `<div class="list-meta">Nenhuma lista criada ainda.</div>`;
     }
 
     function excluirLista(id) {
