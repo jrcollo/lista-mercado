@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lista de Compras - Supermercado - Jrcollo - V35</title>
+    <title>Lista de Compras - Supermercado - Jrcollo - V36</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
     <style>
         :root {
@@ -12,10 +12,14 @@
             --bg: #f1f5f9;
             --c: #ffffff;
             --text: #1e293b;
+            --muted: #64748b;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --dark: #334155;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: Arial, sans-serif;
             background: var(--bg);
             color: var(--text);
             margin: 0;
@@ -29,7 +33,7 @@
             padding: 15px;
             border-radius: 20px;
             width: 100%;
-            max-width: 600px;
+            max-width: 700px;
             min-height: 95vh;
             box-shadow: 0 10px 25px rgba(0,0,0,0.05);
         }
@@ -37,7 +41,7 @@
         .screen { display: none; }
         .screen.active { display: block; }
 
-        input, select {
+        input, select, textarea {
             padding: 12px;
             border: 1px solid #cbd5e1;
             border-radius: 8px;
@@ -61,16 +65,61 @@
 
         .btn-p { background: var(--p); color: white; width: 100%; }
         .btn-w { background: #25d366; color: white; width: 100%; margin: 15px 0; }
-        .btn-scan { background: #334155; color: white; width: 100%; }
+        .btn-scan { background: var(--dark); color: white; width: 100%; }
         .btn-photo { background: #0f766e; color: white; width: 100%; }
-        .btn-torch { background: #f59e0b; color: #111827; width: 100%; }
+        .btn-torch { background: var(--warning); color: #111827; width: 100%; }
         .btn-muted { background: #e2e8f0; color: #475569; width: 100%; }
+        .btn-danger { background: var(--danger); color: white; width: 100%; }
 
         .action-grid-2 {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 8px;
             margin-bottom: 10px;
+        }
+
+        .header-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .header-row h3, .header-row h2 {
+            margin: 0;
+            flex: 1;
+        }
+
+        .list-card {
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 14px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .list-meta {
+            color: var(--muted);
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .icon-btn {
+            border: none;
+            background: #f1f5f9;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .icon-btn.danger {
+            background: #fee2e2;
+            color: #b91c1c;
         }
 
         /* SCANNER */
@@ -154,7 +203,7 @@
             gap: 8px;
         }
 
-        /* OUTROS MODAIS */
+        /* MODAIS */
         .modal {
             position: fixed;
             inset: 0;
@@ -167,11 +216,11 @@
 
         .modal-content {
             background: #fff;
-            width: 90%;
-            max-width: 450px;
+            width: 92%;
+            max-width: 500px;
             padding: 20px;
             border-radius: 15px;
-            max-height: 85vh;
+            max-height: 88vh;
             overflow-y: auto;
         }
 
@@ -189,6 +238,36 @@
             font-size: 0.75rem;
             color: var(--p);
             text-transform: uppercase;
+        }
+
+        .item-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .item-title {
+            font-weight: bold;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .mini-icon {
+            border: none;
+            background: #e2e8f0;
+            border-radius: 8px;
+            padding: 6px 8px;
+            cursor: pointer;
+        }
+
+        .mini-icon.danger {
+            background: #fee2e2;
+            color: #b91c1c;
         }
 
         .calc-grid {
@@ -217,6 +296,23 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
+        }
+
+        .catalog-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 10px;
+            margin-bottom: 8px;
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .catalog-meta {
+            color: var(--muted);
+            font-size: 13px;
+            margin-top: 4px;
         }
 
         .processing-overlay {
@@ -250,7 +346,9 @@
 
 <div class="app-container">
     <div id="screenHome" class="screen active">
-        <h2 style="text-align:center">🛒 Lista de Compras - Jrcollo</h2>
+        <div class="header-row">
+            <h2>🛒 Lista de Compras - Jrcollo</h2>
+        </div>
 
         <div style="display:flex; gap:8px; margin-bottom:20px;">
             <input type="text" id="novaListaNome" placeholder="Nome da Lista">
@@ -270,9 +368,10 @@
     </div>
 
     <div id="screenEditor" class="screen">
-        <div style="display:flex; align-items:center; gap:10px; margin-bottom:15px;">
+        <div class="header-row">
             <button class="btn" onclick="irParaHome()">←</button>
-            <h3 id="tituloListaAtual" style="margin:0; flex:1;"></h3>
+            <h3 id="tituloListaAtual"></h3>
+            <button class="btn btn-muted" onclick="renomearListaAtiva()" style="width:auto;">✏️ Renomear Lista</button>
         </div>
 
         <div style="background:#f8fafc; padding:15px; border-radius:12px; border:1px solid #e2e8f0; margin-bottom:15px;">
@@ -356,7 +455,7 @@
 
         <button class="btn btn-p" onclick="salvarNoCatalogo()">Salvar Item</button>
 
-        <div id="listaItensCatalogo" style="margin-top:15px; max-height:200px; overflow-y:auto;"></div>
+        <div id="listaItensCatalogo" style="margin-top:15px; max-height:300px; overflow-y:auto;"></div>
 
         <button class="btn" style="width:100%; margin-top:10px; background:#ddd" onclick="fecharModalCatalogo()">Fechar</button>
     </div>
@@ -370,6 +469,46 @@
     </div>
 </div>
 
+<div id="modalEditarCatalogo" class="modal">
+    <div class="modal-content">
+        <h3>✏️ Editar Produto do Catálogo</h3>
+        <input type="text" id="editCatEan" inputmode="numeric" placeholder="Código EAN">
+        <input type="text" id="editCatNome" placeholder="Nome do produto">
+        <select id="editCatCategoria"></select>
+        <input type="number" id="editCatPreco" placeholder="Preço R$">
+        <div class="small-note">Ao salvar, o app também atualiza itens das listas que usam este mesmo código.</div>
+        <div class="action-grid-2" style="margin-top:12px;">
+            <button class="btn btn-p" onclick="salvarEdicaoCatalogo()">Salvar Alterações</button>
+            <button class="btn btn-muted" onclick="fecharModalEditarCatalogo()">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<div id="modalEditarItem" class="modal">
+    <div class="modal-content">
+        <h3>✏️ Editar Item da Lista</h3>
+        <input type="text" id="editItemEan" inputmode="numeric" placeholder="Código de barras">
+        <input type="text" id="editItemNome" placeholder="Nome do produto">
+        <select id="editItemCategoria"></select>
+        <div class="action-grid-2">
+            <input type="number" id="editItemQtdP" placeholder="Qtd Prevista">
+            <input type="number" id="editItemValP" placeholder="Valor Previsto">
+        </div>
+        <div class="action-grid-2">
+            <input type="number" id="editItemQtdR" placeholder="Qtd Real">
+            <input type="number" id="editItemValR" placeholder="Valor Real">
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; margin:8px 0 12px;">
+            <input type="checkbox" id="editItemNoCarrinho" style="width:auto; margin:0;">
+            <label for="editItemNoCarrinho">Marcar como já colocado no carrinho</label>
+        </div>
+        <div class="action-grid-2">
+            <button class="btn btn-p" onclick="salvarEdicaoItem()">Salvar Alterações</button>
+            <button class="btn btn-muted" onclick="fecharModalEditarItem()">Cancelar</button>
+        </div>
+    </div>
+</div>
+
 <div id="processingOverlay" class="processing-overlay">
     <div class="processing-box">
         <h3 style="margin-top:0;">Processando imagem</h3>
@@ -380,7 +519,17 @@
 <input id="photoInput" type="file" accept="image/*" style="display:none;">
 
 <script>
-    const KEY = 'app_v35_storage';
+    // IMPORTANTE:
+    // Não mude mais esta chave nas próximas versões.
+    const STORAGE_KEY = 'jrcollo_lista_compras_storage';
+
+    // Chaves antigas para migração automática
+    const LEGACY_KEYS = [
+        'app_v29_storage',
+        'app_v34_storage',
+        'app_v35_storage'
+    ];
+
     const CATS_PADRAO = [
         "🛒 Mercearia", "🍎 Hortifruti", "🥩 Açougue", "🥖 Padaria",
         "🧀 Frios/Laticínios", "❄️ Congelados", "🥤 Bebidas", "🧼 Higiene",
@@ -388,16 +537,79 @@
         "👧 Lanche Crianças", "📦 Outros"
     ];
 
-    let appData = JSON.parse(localStorage.getItem(KEY)) || { listas: {}, categorias: CATS_PADRAO, catalogo: {} };
-    appData.listas = appData.listas || {};
-    appData.categorias = Array.isArray(appData.categorias) && appData.categorias.length ? appData.categorias : [...CATS_PADRAO];
-    appData.catalogo = appData.catalogo || {};
+    function defaultData() {
+        return {
+            version: 36,
+            listas: {},
+            categorias: [...CATS_PADRAO],
+            catalogo: {}
+        };
+    }
 
+    function safeParseStorage(key) {
+        try {
+            const raw = localStorage.getItem(key);
+            return raw ? JSON.parse(raw) : null;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function mergeAppData(base, incoming) {
+        if (!incoming || typeof incoming !== 'object') return base;
+
+        base.version = Math.max(base.version || 0, incoming.version || 0);
+
+        if (incoming.listas && typeof incoming.listas === 'object') {
+            Object.entries(incoming.listas).forEach(([nome, itens]) => {
+                if (!Array.isArray(itens)) return;
+                if (!base.listas[nome]) {
+                    base.listas[nome] = itens;
+                }
+            });
+        }
+
+        if (Array.isArray(incoming.categorias)) {
+            const set = new Set([...(base.categorias || []), ...incoming.categorias]);
+            base.categorias = [...set];
+        }
+
+        if (incoming.catalogo && typeof incoming.catalogo === 'object') {
+            Object.entries(incoming.catalogo).forEach(([ean, item]) => {
+                if (!base.catalogo[ean]) {
+                    base.catalogo[ean] = item;
+                }
+            });
+        }
+
+        if (!base.categorias || !base.categorias.length) {
+            base.categorias = [...CATS_PADRAO];
+        }
+
+        return base;
+    }
+
+    function carregarDados() {
+        let data = defaultData();
+
+        const atual = safeParseStorage(STORAGE_KEY);
+        if (atual) data = mergeAppData(data, atual);
+
+        LEGACY_KEYS.forEach(k => {
+            const legacy = safeParseStorage(k);
+            if (legacy) data = mergeAppData(data, legacy);
+        });
+
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        return data;
+    }
+
+    let appData = carregarDados();
     let listaAtiva = null;
-    let scannerAlvo = 'lista';
 
+    let scannerAlvo = 'lista';
     let scannerRodando = false;
-    let scannerModo = null; // native | quagga
+    let scannerModo = null;
     let scannerInterval = null;
     let mediaStream = null;
     let barcodeDetectorLive = null;
@@ -406,11 +618,14 @@
     let candidatos = new Map();
     let lanternaLigada = false;
 
+    let editandoCatalogoEanOriginal = null;
+    let editandoItemIndex = null;
+
     const scanCanvas = document.createElement('canvas');
     const scanCtx = scanCanvas.getContext('2d', { willReadFrequently: true });
 
     function salvar() {
-        localStorage.setItem(KEY, JSON.stringify(appData));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
         atualizarDatalist();
     }
 
@@ -427,6 +642,10 @@
         return String(v || '').replace(/\D/g, '');
     }
 
+    function formatarMoeda(v) {
+        return Number(v || 0).toFixed(2);
+    }
+
     function atualizarDatalist() {
         const dl = document.getElementById('sugestoes');
         const nomes = Object.values(appData.catalogo).map(i => i.nome).filter(Boolean);
@@ -434,7 +653,8 @@
     }
 
     function atualizarStatusScanner(msg) {
-        document.getElementById('scannerStatus').textContent = msg;
+        const el = document.getElementById('scannerStatus');
+        if (el) el.textContent = msg;
     }
 
     function resetarAreaScanner() {
@@ -474,8 +694,10 @@
         return ean13Valido(code) || ean8Valido(code);
     }
 
-    function formatarMoeda(v) {
-        return Number(v || 0).toFixed(2);
+    function preencherSelectCategorias(id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.innerHTML = appData.categorias.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
     }
 
     function registrarCandidato(code, proporcao = 1, hitsNecessarios = 2) {
@@ -542,9 +764,7 @@
             if (advanced.length) {
                 await track.applyConstraints({ advanced });
             }
-        } catch (e) {
-            // ignora
-        }
+        } catch (e) {}
     }
 
     function atualizarBotaoLanterna(suporta) {
@@ -587,10 +807,7 @@
             }
 
             lanternaLigada = !lanternaLigada;
-            await track.applyConstraints({
-                advanced: [{ torch: lanternaLigada }]
-            });
-
+            await track.applyConstraints({ advanced: [{ torch: lanternaLigada }] });
             atualizarBotaoLanterna(true);
         } catch (e) {
             lanternaLigada = false;
@@ -618,9 +835,7 @@
     }
 
     async function iniciarScannerNativo() {
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            return false;
-        }
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return false;
 
         barcodeDetectorLive = await criarBarcodeDetector();
         if (!barcodeDetectorLive) return false;
@@ -704,9 +919,7 @@
                 registrarCandidato(code, ratio, 2);
                 return;
             }
-        } catch (e) {
-            // ignora
-        }
+        } catch (e) {}
     }
 
     function iniciarScannerQuagga() {
@@ -826,9 +1039,7 @@
         document.getElementById('modalScanner').style.display = 'none';
         resetarAreaScanner();
 
-        if (!silencioso) {
-            atualizarStatusScanner('Scanner encerrado');
-        }
+        if (!silencioso) atualizarStatusScanner('Scanner encerrado');
     }
 
     function escolherFoto(alvo) {
@@ -849,7 +1060,6 @@
             mostrarProcessamento('Tentando localizar o código de barras na foto...');
             const img = await carregarImagemDoArquivo(file);
             const code = await detectarCodigoNaImagem(img);
-
             esconderProcessamento();
 
             if (!code) {
@@ -882,69 +1092,32 @@
         });
     }
 
+    function ajustarDimensoes(w, h, maxLado) {
+        const maior = Math.max(w, h);
+        if (maior <= maxLado) return { w, h };
+        const escala = maxLado / maior;
+        return { w: Math.round(w * escala), h: Math.round(h * escala) };
+    }
+
     function criarCanvasDaImagem(img, sx = 0, sy = 0, sw = img.width, sh = img.height, dw = null, dh = null) {
         const canvas = document.createElement('canvas');
         const escala = dw && dh ? { w: dw, h: dh } : ajustarDimensoes(sw, sh, 1800);
         canvas.width = escala.w;
         canvas.height = escala.h;
-
         const ctx = canvas.getContext('2d', { willReadFrequently: true });
         ctx.drawImage(img, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
         return canvas;
     }
 
-    function ajustarDimensoes(w, h, maxLado) {
-        const maior = Math.max(w, h);
-        if (maior <= maxLado) return { w, h };
-        const escala = maxLado / maior;
-        return {
-            w: Math.round(w * escala),
-            h: Math.round(h * escala)
-        };
-    }
-
     async function detectarCodigoNaImagem(img) {
         const tentativas = [];
-
-        // imagem inteira
         tentativas.push(criarCanvasDaImagem(img));
-
-        // faixa central horizontal
-        tentativas.push(criarCanvasDaImagem(
-            img,
-            img.width * 0.06,
-            img.height * 0.30,
-            img.width * 0.88,
-            img.height * 0.40,
-            1800,
-            550
-        ));
-
-        // faixa mais baixa
-        tentativas.push(criarCanvasDaImagem(
-            img,
-            img.width * 0.06,
-            img.height * 0.38,
-            img.width * 0.88,
-            img.height * 0.28,
-            1800,
-            420
-        ));
-
-        // faixa central mais estreita
-        tentativas.push(criarCanvasDaImagem(
-            img,
-            img.width * 0.10,
-            img.height * 0.35,
-            img.width * 0.80,
-            img.height * 0.26,
-            2000,
-            420
-        ));
+        tentativas.push(criarCanvasDaImagem(img, img.width * 0.06, img.height * 0.30, img.width * 0.88, img.height * 0.40, 1800, 550));
+        tentativas.push(criarCanvasDaImagem(img, img.width * 0.06, img.height * 0.38, img.width * 0.88, img.height * 0.28, 1800, 420));
+        tentativas.push(criarCanvasDaImagem(img, img.width * 0.10, img.height * 0.35, img.width * 0.80, img.height * 0.26, 2000, 420));
 
         for (let i = 0; i < tentativas.length; i++) {
             document.getElementById('processingText').textContent = `Tentativa ${i + 1} de ${tentativas.length}...`;
-
             const code = await detectarCodigoEmCanvas(tentativas[i]);
             if (code) return code;
         }
@@ -953,7 +1126,6 @@
     }
 
     async function detectarCodigoEmCanvas(canvas) {
-        // 1) BarcodeDetector
         if (!barcodeDetectorPhoto) {
             barcodeDetectorPhoto = await criarBarcodeDetector();
         }
@@ -964,33 +1136,21 @@
                 if (resultados && resultados.length) {
                     for (const r of resultados) {
                         const code = somenteDigitos(r.rawValue || '');
-                        if ((code.length === 8 || code.length === 13) && codigoValido(code)) {
-                            return code;
-                        }
+                        if ((code.length === 8 || code.length === 13) && codigoValido(code)) return code;
                     }
                 }
-            } catch (e) {
-                // continua
-            }
+            } catch (e) {}
         }
 
-        // 2) Quagga fallback
         try {
             const dataUrl = canvas.toDataURL('image/png');
             const code = await new Promise((resolve) => {
                 Quagga.decodeSingle({
                     src: dataUrl,
                     numOfWorkers: 0,
-                    inputStream: {
-                        size: 1600
-                    },
-                    locator: {
-                        patchSize: "medium",
-                        halfSample: false
-                    },
-                    decoder: {
-                        readers: ["ean_reader", "ean_8_reader"]
-                    },
+                    inputStream: { size: 1600 },
+                    locator: { patchSize: "medium", halfSample: false },
+                    decoder: { readers: ["ean_reader", "ean_8_reader"] },
                     locate: true
                 }, function(result) {
                     const r = somenteDigitos(result?.codeResult?.code || '');
@@ -998,27 +1158,10 @@
                 });
             });
 
-            if ((code.length === 8 || code.length === 13) && codigoValido(code)) {
-                return code;
-            }
-        } catch (e) {
-            // continua
-        }
+            if ((code.length === 8 || code.length === 13) && codigoValido(code)) return code;
+        } catch (e) {}
 
         return '';
-    }
-
-    function buscarPorNome(nome) {
-        const itemLocal = Object.entries(appData.catalogo).find(([ean, item]) =>
-            String(item.nome || '').trim().toLowerCase() === String(nome || '').trim().toLowerCase()
-        );
-
-        if (itemLocal) {
-            const [ean, item] = itemLocal;
-            document.getElementById('prodEan').value = ean.startsWith('INT_') ? '' : ean;
-            document.getElementById('prodValP').value = item.preco ?? '';
-            document.getElementById('prodCatSelect').value = item.categoria ?? '';
-        }
     }
 
     async function buscarPorEan(ean, contexto) {
@@ -1030,20 +1173,16 @@
         if (!codigo || (codigo.length !== 8 && codigo.length !== 13)) return;
         if (!codigoValido(codigo)) return;
 
-        // busca local
         if (appData.catalogo[codigo]) {
             const item = appData.catalogo[codigo];
             document.getElementById(prefix + 'Nome').value = item.nome || '';
-
             const preco = document.getElementById(prefix + 'ValP') || document.getElementById(prefix + 'Preco');
             if (preco) preco.value = item.preco ?? '';
-
             const cat = document.getElementById(prefix + 'CatSelect');
             if (cat) cat.value = item.categoria || '';
             return;
         }
 
-        // busca online
         try {
             const res = await fetch(`https://world.openfoodfacts.net/api/v2/product/${codigo}?fields=product_name,product_name_pt,product_name_en,generic_name,generic_name_pt,brands`);
             const data = await res.json();
@@ -1066,38 +1205,85 @@
                     nomeFinal = `${nomeFinal} - ${marca}`;
                 }
 
-                if (nomeFinal) {
-                    document.getElementById(prefix + 'Nome').value = nomeFinal;
-                }
+                if (nomeFinal) document.getElementById(prefix + 'Nome').value = nomeFinal;
             }
         } catch (e) {
             console.log("Erro na busca online");
         }
     }
 
-    function criarNovaLista() {
-        const n = document.getElementById('novaListaNome').value.trim();
-        if (n) {
-            appData.listas[n] = [];
-            salvar();
-            renderHome();
-            abrirLista(n);
-            document.getElementById('novaListaNome').value = "";
+    function buscarPorNome(nome) {
+        const itemLocal = Object.entries(appData.catalogo).find(([ean, item]) =>
+            String(item.nome || '').trim().toLowerCase() === String(nome || '').trim().toLowerCase()
+        );
+
+        if (itemLocal) {
+            const [ean, item] = itemLocal;
+            document.getElementById('prodEan').value = ean.startsWith('INT_') ? '' : ean;
+            document.getElementById('prodValP').value = item.preco ?? '';
+            document.getElementById('prodCatSelect').value = item.categoria ?? '';
         }
     }
 
+    function criarNovaLista() {
+        const nome = document.getElementById('novaListaNome').value.trim();
+        if (!nome) return;
+
+        if (appData.listas[nome]) {
+            alert('Já existe uma lista com esse nome.');
+            return;
+        }
+
+        appData.listas[nome] = [];
+        salvar();
+        renderHome();
+        abrirLista(nome);
+        document.getElementById('novaListaNome').value = "";
+    }
+
     function abrirLista(id) {
+        if (!appData.listas[id]) return;
         listaAtiva = id;
         document.getElementById('screenHome').classList.remove('active');
         document.getElementById('screenEditor').classList.add('active');
         document.getElementById('tituloListaAtual').innerText = id;
-        document.getElementById('prodCatSelect').innerHTML = appData.categorias.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+        preencherSelectCategorias('prodCatSelect');
         renderItens();
+    }
+
+    function renomearLista(nomeAtual) {
+        const novoNome = prompt('Novo nome da lista:', nomeAtual || '');
+        if (!novoNome) return;
+
+        const limpo = novoNome.trim();
+        if (!limpo) return;
+        if (limpo === nomeAtual) return;
+
+        if (appData.listas[limpo]) {
+            alert('Já existe uma lista com esse nome.');
+            return;
+        }
+
+        appData.listas[limpo] = appData.listas[nomeAtual] || [];
+        delete appData.listas[nomeAtual];
+
+        if (listaAtiva === nomeAtual) {
+            listaAtiva = limpo;
+            document.getElementById('tituloListaAtual').innerText = limpo;
+        }
+
+        salvar();
+        renderHome();
+    }
+
+    function renomearListaAtiva() {
+        if (!listaAtiva) return;
+        renomearLista(listaAtiva);
     }
 
     function adicionarItem() {
         const nome = document.getElementById('prodNome').value.trim();
-        if (!nome) return;
+        if (!nome || !listaAtiva) return;
 
         appData.listas[listaAtiva].push({
             nome,
@@ -1119,24 +1305,80 @@
         document.getElementById('prodQtdP').value = "1";
     }
 
+    function abrirEditarItem(idx) {
+        if (!listaAtiva || !appData.listas[listaAtiva] || !appData.listas[listaAtiva][idx]) return;
+
+        const item = appData.listas[listaAtiva][idx];
+        editandoItemIndex = idx;
+
+        preencherSelectCategorias('editItemCategoria');
+
+        document.getElementById('editItemEan').value = item.ean || '';
+        document.getElementById('editItemNome').value = item.nome || '';
+        document.getElementById('editItemCategoria').value = item.cat || '';
+        document.getElementById('editItemQtdP').value = item.qtdP ?? 1;
+        document.getElementById('editItemValP').value = item.valP ?? 0;
+        document.getElementById('editItemQtdR').value = item.qtdR ?? 1;
+        document.getElementById('editItemValR').value = item.valR ?? 0;
+        document.getElementById('editItemNoCarrinho').checked = !!item.noCarrinho;
+
+        document.getElementById('modalEditarItem').style.display = 'flex';
+    }
+
+    function fecharModalEditarItem() {
+        editandoItemIndex = null;
+        document.getElementById('modalEditarItem').style.display = 'none';
+    }
+
+    function salvarEdicaoItem() {
+        if (editandoItemIndex === null || !listaAtiva) return;
+
+        const item = appData.listas[listaAtiva][editandoItemIndex];
+        if (!item) return;
+
+        item.ean = somenteDigitos(document.getElementById('editItemEan').value);
+        item.nome = document.getElementById('editItemNome').value.trim();
+        item.cat = document.getElementById('editItemCategoria').value;
+        item.qtdP = parseFloat(document.getElementById('editItemQtdP').value) || 1;
+        item.valP = parseFloat(document.getElementById('editItemValP').value) || 0;
+        item.qtdR = parseFloat(document.getElementById('editItemQtdR').value) || 0;
+        item.valR = parseFloat(document.getElementById('editItemValR').value) || 0;
+        item.noCarrinho = !!document.getElementById('editItemNoCarrinho').checked;
+
+        if (!item.nome) {
+            alert('Informe o nome do produto.');
+            return;
+        }
+
+        salvar();
+        fecharModalEditarItem();
+        renderItens();
+    }
+
     function renderItens() {
         const container = document.getElementById('corpoLista');
         container.innerHTML = "";
 
         const itens = appData.listas[listaAtiva] || [];
-        const cats = [...new Set(itens.map(i => i.cat))].sort();
+        const cats = [...new Set(itens.map(i => i.cat || "📦 Outros"))].sort();
 
         cats.forEach(cat => {
             container.innerHTML += `<div class="category-header">${escapeHtml(cat)}</div>`;
 
-            itens.filter(i => i.cat === cat).forEach(item => {
-                const idx = appData.listas[listaAtiva].indexOf(item);
+            itens.forEach((item, idx) => {
+                if ((item.cat || "📦 Outros") !== cat) return;
 
                 container.innerHTML += `
                     <div class="item-row">
-                        <div style="display:flex; justify-content:space-between; font-weight:bold;">
-                            <span>${escapeHtml(item.nome)}</span>
-                            <span onclick="appData.listas[listaAtiva].splice(${idx},1);salvar();renderItens();" style="color:red; cursor:pointer;">🗑️</span>
+                        <div class="item-top">
+                            <div>
+                                <div class="item-title">${escapeHtml(item.nome)}</div>
+                                <div class="catalog-meta">EAN: ${escapeHtml(item.ean || '-')} • Categoria: ${escapeHtml(item.cat || '📦 Outros')}</div>
+                            </div>
+                            <div class="item-actions">
+                                <button class="mini-icon" onclick="abrirEditarItem(${idx})">✏️</button>
+                                <button class="mini-icon danger" onclick="excluirItem(${idx})">🗑️</button>
+                            </div>
                         </div>
 
                         <div class="calc-grid">
@@ -1162,10 +1404,18 @@
         calcularTotais();
     }
 
+    function excluirItem(idx) {
+        if (!listaAtiva) return;
+        if (!confirm('Excluir este item da lista?')) return;
+        appData.listas[listaAtiva].splice(idx, 1);
+        salvar();
+        renderItens();
+    }
+
     function calcularTotais() {
         const itens = appData.listas[listaAtiva] || [];
-        const tP = itens.reduce((acc, i) => acc + (i.qtdP * i.valP), 0);
-        const tR = itens.reduce((acc, i) => acc + (i.qtdR * i.valR), 0);
+        const tP = itens.reduce((acc, i) => acc + ((parseFloat(i.qtdP) || 0) * (parseFloat(i.valP) || 0)), 0);
+        const tR = itens.reduce((acc, i) => acc + ((parseFloat(i.qtdR) || 0) * (parseFloat(i.valR) || 0)), 0);
 
         document.getElementById('totalPrevisto').innerText = `R$ ${formatarMoeda(tP)}`;
         document.getElementById('totalReal').innerText = `R$ ${formatarMoeda(tR)}`;
@@ -1185,7 +1435,7 @@
 
     function abrirModalCatalogo() {
         document.getElementById('modalCatalogo').style.display = 'flex';
-        document.getElementById('catCatSelect').innerHTML = appData.categorias.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+        preencherSelectCategorias('catCatSelect');
         renderCatalogo();
     }
 
@@ -1194,15 +1444,19 @@
     }
 
     function salvarNoCatalogo() {
-        const eanDigitado = somenteDigitos(document.getElementById('catEan').value);
+        let eanDigitado = somenteDigitos(document.getElementById('catEan').value);
+        const nome = document.getElementById('catNome').value.trim();
+        const categoria = document.getElementById('catCatSelect').value;
+        const preco = parseFloat(document.getElementById('catPreco').value) || 0;
+
+        if (!nome) {
+            alert('Informe o nome do produto.');
+            return;
+        }
+
         const ean = (eanDigitado.length === 8 || eanDigitado.length === 13) ? eanDigitado : "INT_" + Date.now();
 
-        appData.catalogo[ean] = {
-            nome: document.getElementById('catNome').value.trim(),
-            preco: parseFloat(document.getElementById('catPreco').value) || 0,
-            categoria: document.getElementById('catCatSelect').value
-        };
-
+        appData.catalogo[ean] = { nome, preco, categoria };
         salvar();
         renderCatalogo();
 
@@ -1211,13 +1465,102 @@
         document.getElementById('catPreco').value = "";
     }
 
+    function abrirEditarCatalogo(ean) {
+        const item = appData.catalogo[ean];
+        if (!item) return;
+
+        editandoCatalogoEanOriginal = ean;
+        preencherSelectCategorias('editCatCategoria');
+
+        document.getElementById('editCatEan').value = ean.startsWith('INT_') ? '' : ean;
+        document.getElementById('editCatNome').value = item.nome || '';
+        document.getElementById('editCatCategoria').value = item.categoria || '';
+        document.getElementById('editCatPreco').value = item.preco ?? 0;
+
+        document.getElementById('modalEditarCatalogo').style.display = 'flex';
+    }
+
+    function fecharModalEditarCatalogo() {
+        editandoCatalogoEanOriginal = null;
+        document.getElementById('modalEditarCatalogo').style.display = 'none';
+    }
+
+    function salvarEdicaoCatalogo() {
+        if (!editandoCatalogoEanOriginal) return;
+
+        const nome = document.getElementById('editCatNome').value.trim();
+        const categoria = document.getElementById('editCatCategoria').value;
+        const preco = parseFloat(document.getElementById('editCatPreco').value) || 0;
+        const eanDigitado = somenteDigitos(document.getElementById('editCatEan').value);
+
+        if (!nome) {
+            alert('Informe o nome do produto.');
+            return;
+        }
+
+        let novoEan = editandoCatalogoEanOriginal;
+        if (eanDigitado) {
+            if (!(eanDigitado.length === 8 || eanDigitado.length === 13)) {
+                alert('O código deve ter 8 ou 13 dígitos.');
+                return;
+            }
+            novoEan = eanDigitado;
+        }
+
+        if (novoEan !== editandoCatalogoEanOriginal && appData.catalogo[novoEan]) {
+            if (!confirm('Já existe um produto com esse código. Deseja sobrescrever?')) return;
+        }
+
+        const produtoAtualizado = { nome, categoria, preco };
+
+        if (novoEan !== editandoCatalogoEanOriginal) {
+            delete appData.catalogo[editandoCatalogoEanOriginal];
+        }
+        appData.catalogo[novoEan] = produtoAtualizado;
+
+        // Atualiza também os itens das listas que usam esse produto
+        Object.keys(appData.listas).forEach(nomeLista => {
+            appData.listas[nomeLista].forEach(item => {
+                if ((item.ean || '') === editandoCatalogoEanOriginal || (item.ean || '') === novoEan) {
+                    item.ean = novoEan.startsWith('INT_') ? '' : novoEan;
+                    item.nome = nome;
+                    item.cat = categoria;
+                    item.valP = preco;
+                }
+            });
+        });
+
+        salvar();
+        fecharModalEditarCatalogo();
+        renderCatalogo();
+        if (listaAtiva) renderItens();
+    }
+
+    function excluirDoCatalogo(ean) {
+        if (!confirm('Excluir este produto do catálogo?')) return;
+        delete appData.catalogo[ean];
+        salvar();
+        renderCatalogo();
+    }
+
     function renderCatalogo() {
-        document.getElementById('listaItensCatalogo').innerHTML = Object.keys(appData.catalogo).map(ean => `
-            <div style="display:flex; justify-content:space-between; padding:5px; border-bottom:1px solid #eee; gap:10px;">
-                <span style="flex:1;">${escapeHtml(appData.catalogo[ean].nome || '')}</span>
-                <b onclick="delete appData.catalogo['${ean}']; salvar(); renderCatalogo();" style="color:red; cursor:pointer;">✕</b>
-            </div>
-        `).join('');
+        const html = Object.keys(appData.catalogo).map(ean => {
+            const item = appData.catalogo[ean];
+            return `
+                <div class="catalog-card">
+                    <div>
+                        <div><b>${escapeHtml(item.nome || '')}</b></div>
+                        <div class="catalog-meta">
+                            EAN: ${escapeHtml(ean)} • ${escapeHtml(item.categoria || '📦 Outros')} • R$ ${formatarMoeda(item.preco)}
+                        </div>
+                    </div>
+                    <button class="icon-btn" onclick="abrirEditarCatalogo(${JSON.stringify(ean)})">✏️</button>
+                    <button class="icon-btn danger" onclick="excluirDoCatalogo(${JSON.stringify(ean)})">🗑️</button>
+                </div>
+            `;
+        }).join('');
+
+        document.getElementById('listaItensCatalogo').innerHTML = html || `<div class="catalog-meta">Nenhum produto cadastrado ainda.</div>`;
     }
 
     function abrirModalCats() {
@@ -1226,9 +1569,8 @@
     }
 
     function renderCatsList() {
-        document.getElementById('listaCategoriasEdicao').innerHTML = appData.categorias.map(c =>
-            `<div style="padding:10px; border-bottom:1px solid #eee">${escapeHtml(c)}</div>`
-        ).join('');
+        document.getElementById('listaCategoriasEdicao').innerHTML =
+            appData.categorias.map(c => `<div style="padding:10px; border-bottom:1px solid #eee">${escapeHtml(c)}</div>`).join('');
     }
 
     function irParaHome() {
@@ -1239,12 +1581,29 @@
     }
 
     function renderHome() {
-        document.getElementById('listaDeArquivos').innerHTML = Object.keys(appData.listas).map(id => `
-            <div style="background:#fff; border:1px solid #ddd; padding:15px; border-radius:12px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; gap:12px;">
-                <b onclick="abrirLista(${JSON.stringify(id)})" style="flex:1; cursor:pointer;">${escapeHtml(id)}</b>
-                <span onclick="if(confirm('Apagar lista?')){delete appData.listas[${JSON.stringify(id)}]; salvar(); renderHome();}" style="color:red; margin-left:15px; cursor:pointer;">🗑️</span>
-            </div>
-        `).join('');
+        const html = Object.keys(appData.listas).map(id => {
+            const qtd = (appData.listas[id] || []).length;
+            return `
+                <div class="list-card">
+                    <div onclick="abrirLista(${JSON.stringify(id)})" style="cursor:pointer;">
+                        <div><b>${escapeHtml(id)}</b></div>
+                        <div class="list-meta">${qtd} item(ns)</div>
+                    </div>
+                    <button class="icon-btn" onclick="renomearLista(${JSON.stringify(id)})">✏️</button>
+                    <button class="icon-btn danger" onclick="excluirLista(${JSON.stringify(id)})">🗑️</button>
+                </div>
+            `;
+        }).join('');
+
+        document.getElementById('listaDeArquivos').innerHTML = html || `<div class="list-meta">Nenhuma lista criada ainda.</div>`;
+    }
+
+    function excluirLista(id) {
+        if (!confirm('Apagar lista?')) return;
+        delete appData.listas[id];
+        if (listaAtiva === id) listaAtiva = null;
+        salvar();
+        renderHome();
     }
 
     function exportarBackup() {
@@ -1253,17 +1612,17 @@
 
     function importarBackup() {
         const b = prompt("Cole o Backup:");
-        if (b) {
-            try {
-                appData = JSON.parse(decodeURIComponent(escape(atob(b))));
-                appData.listas = appData.listas || {};
-                appData.catalogo = appData.catalogo || {};
-                appData.categorias = Array.isArray(appData.categorias) && appData.categorias.length ? appData.categorias : [...CATS_PADRAO];
-                salvar();
-                location.reload();
-            } catch(e) {
-                alert("Erro!");
-            }
+        if (!b) return;
+
+        try {
+            const dadoImportado = JSON.parse(decodeURIComponent(escape(atob(b))));
+            const base = defaultData();
+            appData = mergeAppData(base, appData);
+            appData = mergeAppData(appData, dadoImportado);
+            salvar();
+            location.reload();
+        } catch(e) {
+            alert("Erro!");
         }
     }
 
