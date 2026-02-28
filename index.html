@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lista de Compras - Supermercado - Jrcollo - V33</title>
+    <title>Lista de Compras - Supermercado - Jrcollo - V34</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
     <style>
         :root { --p: #6366f1; --s: #22c55e; --bg: #f1f5f9; --c: #ffffff; --text: #1e293b; }
@@ -11,76 +11,167 @@
         .app-container { background: var(--c); padding: 15px; border-radius: 20px; width: 100%; max-width: 600px; min-height: 95vh; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
         .screen { display: none; }
         .screen.active { display: block; }
+
         input, select {
-            padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px;
-            font-size: 16px; width: 100%; margin-bottom: 8px; box-sizing: border-box;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 16px;
+            width: 100%;
+            margin-bottom: 8px;
+            box-sizing: border-box;
         }
+
         .btn {
-            border: none; padding: 12px; border-radius: 8px; cursor: pointer;
-            font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
+
         .btn-p { background: var(--p); color: white; width: 100%; }
         .btn-w { background: #25d366; color: white; width: 100%; margin: 15px 0; }
         .btn-scan { background: #334155; color: white; width: 100%; margin-bottom: 10px; }
 
         /* LAYOUT SCANNER */
         .modal-scanner {
-            position: fixed; top:0; left:0; width:100%; height:100%;
-            background:rgba(0,0,0,0.9); display:none; flex-direction: column; z-index: 99999;
+            position: fixed;
+            top:0; left:0; width:100%; height:100%;
+            background:rgba(0,0,0,0.92);
+            display:none;
+            flex-direction: column;
+            z-index: 99999;
         }
+
         #interactive.viewport {
-            width: 100%; height: 70vh; background: #000; position: relative; overflow: hidden;
+            width: 100%;
+            height: 70vh;
+            background: #000;
+            position: relative;
+            overflow: hidden;
         }
+
         #interactive.viewport video,
         #interactive.viewport canvas {
-            width: 100%; height: 100%; object-fit: cover;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
+
         .scan-overlay {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 84%; height: min(22vh, 140px); min-height: 110px;
-            border: 2px solid var(--s); border-radius: 10px; z-index: 10;
-            box-shadow: 0 0 0 1000px rgba(0,0,0,0.52);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 84%;
+            height: 22vh;
+            min-height: 110px;
+            max-height: 150px;
+            border: 2px solid var(--s);
+            border-radius: 10px;
+            z-index: 10;
+            box-shadow: 0 0 0 9999px rgba(0,0,0,0.52);
             pointer-events: none;
         }
+
         .scan-line {
-            position: absolute; width: 100%; height: 2px; background: red; top: 50%;
-            box-shadow: 0 0 8px red; animation: scanAnim 2s infinite; z-index: 11;
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: red;
+            top: 50%;
+            box-shadow: 0 0 8px red;
+            animation: scanAnim 2s infinite;
+            z-index: 11;
         }
-        @keyframes scanAnim { 0% { top: 0%; } 50% { top: 100%; } 100% { top: 0%; } }
+
+        @keyframes scanAnim {
+            0% { top: 0%; }
+            50% { top: 100%; }
+            100% { top: 0%; }
+        }
+
         .scanner-footer {
-            background:#000; padding:20px; text-align:center; flex:1; display:flex;
-            flex-direction:column; justify-content:center;
+            background:#000;
+            padding:20px;
+            text-align:center;
+            flex:1;
+            display:flex;
+            flex-direction:column;
+            justify-content:center;
+        }
+
+        .scanner-status {
+            color:#93c5fd;
+            font-size:13px;
+            min-height:18px;
+            margin-top:8px;
         }
 
         /* OUTROS MODAIS */
         .modal {
-            position: fixed; top:0; left:0; width:100%; height:100%;
-            background:rgba(0,0,0,0.8); display:none; justify-content:center; align-items:center; z-index: 9000;
+            position: fixed;
+            top:0; left:0; width:100%; height:100%;
+            background:rgba(0,0,0,0.8);
+            display:none;
+            justify-content:center;
+            align-items:center;
+            z-index: 9000;
         }
+
         .modal-content {
-            background:#fff; width:90%; max-width:450px; padding:20px; border-radius:15px;
-            max-height:85vh; overflow-y:auto;
+            background:#fff;
+            width:90%;
+            max-width:450px;
+            padding:20px;
+            border-radius:15px;
+            max-height:85vh;
+            overflow-y:auto;
         }
 
         .item-row { border-bottom: 2px solid #f1f5f9; padding: 12px 0; }
         .category-header {
-            background: #f1f5f9; padding: 8px; border-radius: 6px; font-weight: 800;
-            margin-top: 15px; font-size: 0.75rem; color: var(--p); text-transform: uppercase;
+            background: #f1f5f9;
+            padding: 8px;
+            border-radius: 6px;
+            font-weight: 800;
+            margin-top: 15px;
+            font-size: 0.75rem;
+            color: var(--p);
+            text-transform: uppercase;
         }
+
         .calc-grid {
-            display: grid; grid-template-columns: 30px 1.2fr 1fr 1fr 1fr;
-            gap: 5px; align-items: center; font-size: 0.8rem;
+            display: grid;
+            grid-template-columns: 30px 1.2fr 1fr 1fr 1fr;
+            gap: 5px;
+            align-items: center;
+            font-size: 0.8rem;
         }
+
         .mini-input {
-            padding: 6px; font-size: 0.85rem; border: 1px solid #e2e8f0;
-            border-radius: 4px; text-align: right; width: 100%;
+            padding: 6px;
+            font-size: 0.85rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            text-align: right;
+            width: 100%;
         }
+
         .footer-summary {
-            position: sticky; bottom: 0; background: white; padding: 15px;
-            border-top: 2px solid #e2e8f0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
-        }
-        .scanner-status {
-            color:#93c5fd; font-size:13px; min-height:18px; margin-top:8px;
+            position: sticky;
+            bottom: 0;
+            background: white;
+            padding: 15px;
+            border-top: 2px solid #e2e8f0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
         }
     </style>
 </head>
@@ -108,6 +199,7 @@
             <button class="btn" onclick="irParaHome()">←</button>
             <h3 id="tituloListaAtual" style="margin:0; flex:1;"></h3>
         </div>
+
         <div style="background:#f8fafc; padding:15px; border-radius:12px; border:1px solid #e2e8f0; margin-bottom:15px;">
             <button class="btn btn-scan" onclick="iniciarLeitor('lista')">📸 Scanear Produto</button>
 
@@ -132,7 +224,6 @@
         </div>
 
         <div id="corpoLista"></div>
-
         <button class="btn btn-w" onclick="compartilharWhatsApp()">Finalizar e Enviar WhatsApp</button>
 
         <div class="footer-summary">
@@ -147,7 +238,7 @@
         <div class="scan-overlay"><div class="scan-line"></div></div>
     </div>
     <div class="scanner-footer">
-        <p style="color:#fff; margin-bottom:10px; font-size:14px;">Ajuste o código principal dentro do retângulo e aproxime até ele ocupar boa parte da área.</p>
+        <p style="color:#fff; margin-bottom:10px; font-size:14px;">Centralize o código principal dentro do retângulo</p>
         <div id="scannerStatus" class="scanner-status">Preparando câmera...</div>
         <button class="btn" style="background:#ef4444; color:#fff; width:100%; padding:15px; margin-top:12px;" onclick="pararLeitor()">Cancelar</button>
     </div>
@@ -185,33 +276,36 @@
 </div>
 
 <script>
-    const KEY = 'app_v29_storage';
+    const KEY = 'app_v34_storage';
     const CATS_PADRAO = [
-        "🛒 Mercearia", "🍎 Hortifruti", "🥩 Açougue", "🥖 Padaria", "🧀 Frios/Laticínios",
-        "❄️ Congelados", "🥤 Bebidas", "🧼 Higiene", "🧹 Limpeza", "🏠 Utilidades Domésticas",
-        "🐾 Pet Shop", "👧 Lanche Crianças", "📦 Outros"
+        "🛒 Mercearia", "🍎 Hortifruti", "🥩 Açougue", "🥖 Padaria",
+        "🧀 Frios/Laticínios", "❄️ Congelados", "🥤 Bebidas", "🧼 Higiene",
+        "🧹 Limpeza", "🏠 Utilidades Domésticas", "🐾 Pet Shop",
+        "👧 Lanche Crianças", "📦 Outros"
     ];
 
     let appData = JSON.parse(localStorage.getItem(KEY)) || { listas: {}, categorias: CATS_PADRAO, catalogo: {} };
     appData.listas = appData.listas || {};
+    appData.categorias = appData.categorias || [...CATS_PADRAO];
     appData.catalogo = appData.catalogo || {};
-    appData.categorias = Array.isArray(appData.categorias) && appData.categorias.length ? appData.categorias : [...CATS_PADRAO];
 
     let listaAtiva = null;
     let scannerAlvo = 'lista';
+
     let scannerRodando = false;
+    let scannerModo = null; // native | quagga
+    let scannerInterval = null;
+    let mediaStream = null;
+    let barcodeDetector = null;
     let quaggaDetectedHandler = null;
-    let candidatosLeitura = new Map();
+    let candidatos = new Map();
+
+    const scanCanvas = document.createElement('canvas');
+    const scanCtx = scanCanvas.getContext('2d', { willReadFrequently: true });
 
     function salvar() {
         localStorage.setItem(KEY, JSON.stringify(appData));
         atualizarDatalist();
-    }
-
-    function atualizarDatalist() {
-        const dl = document.getElementById('sugestoes');
-        const nomes = Object.values(appData.catalogo).map(i => i.nome).filter(Boolean);
-        dl.innerHTML = [...new Set(nomes)].map(n => `<option value="${escapeHtml(n)}">`).join('');
     }
 
     function escapeHtml(str) {
@@ -223,56 +317,22 @@
             .replace(/'/g, '&#39;');
     }
 
-    function somenteDigitos(valor) {
-        return String(valor || '').replace(/\D/g, '');
+    function somenteDigitos(v) {
+        return String(v || '').replace(/\D/g, '');
     }
 
-    function formatarMoedaBr(valor) {
-        return Number(valor || 0).toFixed(2);
-    }
-
-    function resetarViewportScanner() {
-        document.getElementById('interactive').innerHTML = `
-            <div class="scan-overlay"><div class="scan-line"></div></div>
-        `;
-    }
-
-    function limparEventosScanner() {
-        try {
-            if (quaggaDetectedHandler) {
-                Quagga.offDetected(quaggaDetectedHandler);
-                quaggaDetectedHandler = null;
-            }
-        } catch (e) {}
+    function atualizarDatalist() {
+        const dl = document.getElementById('sugestoes');
+        const nomes = Object.values(appData.catalogo).map(i => i.nome).filter(Boolean);
+        dl.innerHTML = [...new Set(nomes)].map(n => `<option value="${escapeHtml(n)}">`).join('');
     }
 
     function atualizarStatusScanner(msg) {
-        const el = document.getElementById('scannerStatus');
-        if (el) el.textContent = msg;
+        document.getElementById('scannerStatus').textContent = msg;
     }
 
-    function distanciaPontos(a, b) {
-        if (!a || !b) return 0;
-        const dx = (a.x ?? a[0] ?? 0) - (b.x ?? b[0] ?? 0);
-        const dy = (a.y ?? a[1] ?? 0) - (b.y ?? b[1] ?? 0);
-        return Math.sqrt(dx * dx + dy * dy);
-    }
-
-    function larguraDeteccao(data) {
-        if (data && Array.isArray(data.line) && data.line.length >= 2) {
-            return distanciaPontos(data.line[0], data.line[1]);
-        }
-        if (data && Array.isArray(data.box) && data.box.length >= 4) {
-            const lado1 = distanciaPontos(data.box[0], data.box[1]);
-            const lado2 = distanciaPontos(data.box[1], data.box[2]);
-            return Math.max(lado1, lado2);
-        }
-        return 0;
-    }
-
-    function getLarguraVideoAtual() {
-        const video = document.querySelector('#interactive video');
-        return video && video.videoWidth ? video.videoWidth : Math.max(document.getElementById('interactive').clientWidth || 1, 1);
+    function resetarAreaScanner() {
+        document.getElementById('interactive').innerHTML = `<div class="scan-overlay"><div class="scan-line"></div></div>`;
     }
 
     function ean13Valido(code) {
@@ -295,37 +355,42 @@
         return digito === parseInt(code[7], 10);
     }
 
-    function codigoDeBarrasValido(code) {
+    function codigoValido(code) {
         return ean13Valido(code) || ean8Valido(code);
     }
 
-    function limparCandidatosAntigos() {
+    function registrarCandidato(code, proporcao = 1, hitsNecessarios = 2) {
         const agora = Date.now();
-        for (const [codigo, info] of candidatosLeitura.entries()) {
-            if (agora - info.ultimo > 1800) {
-                candidatosLeitura.delete(codigo);
-            }
+
+        for (const [k, v] of candidatos.entries()) {
+            if (agora - v.ultimo > 1800) candidatos.delete(k);
+        }
+
+        const item = candidatos.get(code) || { hits: 0, ultimo: 0, melhor: 0 };
+        item.hits += 1;
+        item.ultimo = agora;
+        item.melhor = Math.max(item.melhor, proporcao);
+        candidatos.set(code, item);
+
+        atualizarStatusScanner(`Lendo ${code}... ${item.hits}/${hitsNecessarios}`);
+
+        if (item.hits >= hitsNecessarios) {
+            finalizarLeitura(code);
         }
     }
 
-    function confirmarLeituraScanner(code) {
+    function finalizarLeitura(code) {
         if (navigator.vibrate) navigator.vibrate(100);
-
-        pararLeitor();
 
         const campo = scannerAlvo === 'lista' ? 'prodEan' : 'catEan';
         document.getElementById(campo).value = code;
+
+        pararLeitor(true);
         buscarPorEan(code, scannerAlvo);
     }
 
-    async function aplicarMelhoriasCameraSePossivel() {
+    async function aplicarMelhoriasCamera(track) {
         try {
-            await new Promise(r => setTimeout(r, 500));
-
-            const video = document.querySelector('#interactive video');
-            if (!video || !video.srcObject) return;
-
-            const track = video.srcObject.getVideoTracks && video.srcObject.getVideoTracks()[0];
             if (!track || typeof track.getCapabilities !== 'function' || typeof track.applyConstraints !== 'function') return;
 
             const caps = track.getCapabilities();
@@ -344,133 +409,244 @@
                 await track.applyConstraints({ advanced });
             }
         } catch (e) {
-            // Ignora se o aparelho/navegador não suportar
+            // ignore
         }
     }
 
-    function iniciarLeitor(alvo) {
+    async function iniciarLeitor(alvo) {
         scannerAlvo = alvo;
-        candidatosLeitura = new Map();
+        candidatos = new Map();
 
-        if (scannerRodando) {
-            pararLeitor(true);
-        }
+        await pararLeitor(true);
 
-        resetarViewportScanner();
         document.getElementById('modalScanner').style.display = 'flex';
+        resetarAreaScanner();
         atualizarStatusScanner('Abrindo câmera...');
 
-        const target = document.querySelector('#interactive');
+        const iniciouNativo = await iniciarScannerNativo();
+        if (!iniciouNativo) {
+            atualizarStatusScanner('Usando modo compatibilidade...');
+            iniciarScannerQuagga();
+        }
+    }
+
+    async function iniciarScannerNativo() {
+        if (!('BarcodeDetector' in window) || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            return false;
+        }
+
+        try {
+            barcodeDetector = new BarcodeDetector({
+                formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e']
+            });
+        } catch (e) {
+            return false;
+        }
+
+        try {
+            mediaStream = await navigator.mediaDevices.getUserMedia({
+                audio: false,
+                video: {
+                    facingMode: { ideal: 'environment' },
+                    width: { ideal: 1920 },
+                    height: { ideal: 1080 }
+                }
+            });
+
+            const container = document.getElementById('interactive');
+            const video = document.createElement('video');
+            video.id = 'scannerVideo';
+            video.autoplay = true;
+            video.muted = true;
+            video.playsInline = true;
+            video.setAttribute('autoplay', '');
+            video.setAttribute('muted', '');
+            video.setAttribute('playsinline', '');
+
+            container.prepend(video);
+            video.srcObject = mediaStream;
+
+            await video.play();
+
+            const track = mediaStream.getVideoTracks()[0];
+            await aplicarMelhoriasCamera(track);
+
+            scannerRodando = true;
+            scannerModo = 'native';
+
+            atualizarStatusScanner('Aponte para o código principal dentro do retângulo');
+
+            scannerInterval = setInterval(scanFrameNativo, 180);
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    async function scanFrameNativo() {
+        if (!scannerRodando || scannerModo !== 'native') return;
+
+        const video = document.getElementById('scannerVideo');
+        if (!video || !video.videoWidth || !video.videoHeight) return;
+
+        try {
+            const vw = video.videoWidth;
+            const vh = video.videoHeight;
+
+            const sx = Math.round(vw * 0.08);
+            const sy = Math.round(vh * 0.38);
+            const sw = Math.round(vw * 0.84);
+            const sh = Math.round(vh * 0.24);
+
+            scanCanvas.width = 1600;
+            scanCanvas.height = 400;
+
+            scanCtx.drawImage(video, sx, sy, sw, sh, 0, 0, scanCanvas.width, scanCanvas.height);
+
+            const resultados = await barcodeDetector.detect(scanCanvas);
+            if (!resultados || !resultados.length) return;
+
+            for (const r of resultados) {
+                const code = somenteDigitos(r.rawValue || '');
+                if (!code) continue;
+                if (!(code.length === 8 || code.length === 13)) continue;
+                if (!codigoValido(code)) continue;
+
+                let ratio = 1;
+                if (r.boundingBox && r.boundingBox.width) {
+                    ratio = r.boundingBox.width / scanCanvas.width;
+                }
+
+                if (ratio < 0.35) {
+                    atualizarStatusScanner('Aproxime mais o código principal');
+                    continue;
+                }
+
+                registrarCandidato(code, ratio, 2);
+                return;
+            }
+        } catch (e) {
+            // ignore
+        }
+    }
+
+    function iniciarScannerQuagga() {
+        resetarAreaScanner();
 
         Quagga.init({
             inputStream: {
                 name: "Live",
                 type: "LiveStream",
-                target: target,
+                target: document.querySelector('#interactive'),
                 constraints: {
                     facingMode: { ideal: "environment" },
                     width: { ideal: 1920 },
                     height: { ideal: 1080 }
                 },
                 area: {
-                    top: "33%",
+                    top: "38%",
                     right: "8%",
                     left: "8%",
-                    bottom: "33%"
-                },
-                singleChannel: false
+                    bottom: "38%"
+                }
             },
             locator: {
                 patchSize: "small",
-                halfSample: true
+                halfSample: false
             },
             numOfWorkers: Math.min(navigator.hardwareConcurrency || 2, 4),
             frequency: 10,
             decoder: {
-                readers: ["ean_reader", "ean_8_reader"],
-                multiple: false
+                readers: ["ean_reader", "ean_8_reader"]
             },
             locate: true
-        }, async function(err) {
+        }, function(err) {
             if (err) {
                 alert("Erro ao abrir câmera: " + err);
-                pararLeitor();
+                pararLeitor(true);
                 return;
             }
 
             scannerRodando = true;
+            scannerModo = 'quagga';
+            atualizarStatusScanner('Aponte para o código principal dentro do retângulo');
             Quagga.start();
-            atualizarStatusScanner('Aponte para o código principal dentro do retângulo.');
-            await aplicarMelhoriasCameraSePossivel();
         });
 
-        limparEventosScanner();
+        if (quaggaDetectedHandler) {
+            try { Quagga.offDetected(quaggaDetectedHandler); } catch(e) {}
+        }
 
         quaggaDetectedHandler = function(data) {
-            try {
-                const code = somenteDigitos(data?.codeResult?.code || '');
-                if (!code) return;
-                if (!codigoDeBarrasValido(code)) return;
+            const code = somenteDigitos(data?.codeResult?.code || '');
+            if (!code) return;
+            if (!(code.length === 8 || code.length === 13)) return;
+            if (!codigoValido(code)) return;
 
-                const largura = larguraDeteccao(data);
-                const larguraVideo = getLarguraVideoAtual();
-                const proporcao = larguraVideo ? (largura / larguraVideo) : 0;
+            let ratio = 1;
+            const video = document.querySelector('#interactive video');
+            const vw = video && video.videoWidth ? video.videoWidth : 1000;
 
-                // Rejeita leituras muito pequenas, que normalmente são códigos secundários/errados
-                if (proporcao < 0.35) {
-                    atualizarStatusScanner('Aproxime mais o código principal.');
-                    return;
-                }
-
-                limparCandidatosAntigos();
-
-                const atual = candidatosLeitura.get(code) || { hits: 0, ultimo: 0, melhorProporcao: 0 };
-                atual.hits += 1;
-                atual.ultimo = Date.now();
-                atual.melhorProporcao = Math.max(atual.melhorProporcao, proporcao);
-                candidatosLeitura.set(code, atual);
-
-                atualizarStatusScanner(`Lendo ${code}... confirmação ${atual.hits}/4`);
-
-                if (atual.hits >= 4 || (atual.hits >= 3 && atual.melhorProporcao >= 0.5)) {
-                    confirmarLeituraScanner(code);
-                }
-            } catch (e) {
-                console.log('Erro no processamento da leitura', e);
+            if (data && Array.isArray(data.line) && data.line.length >= 2) {
+                const p1 = data.line[0];
+                const p2 = data.line[1];
+                const dx = (p1.x || 0) - (p2.x || 0);
+                const dy = (p1.y || 0) - (p2.y || 0);
+                const largura = Math.sqrt(dx * dx + dy * dy);
+                ratio = largura / vw;
             }
+
+            if (ratio < 0.30) {
+                atualizarStatusScanner('Aproxime mais o código principal');
+                return;
+            }
+
+            registrarCandidato(code, ratio, 3);
         };
 
         Quagga.onDetected(quaggaDetectedHandler);
     }
 
-    function pararLeitor(silencioso = false) {
-        limparEventosScanner();
+    async function pararLeitor(silencioso = false) {
+        if (scannerInterval) {
+            clearInterval(scannerInterval);
+            scannerInterval = null;
+        }
 
-        try {
-            Quagga.stop();
-        } catch (e) {}
+        if (quaggaDetectedHandler) {
+            try { Quagga.offDetected(quaggaDetectedHandler); } catch(e) {}
+            quaggaDetectedHandler = null;
+        }
+
+        try { Quagga.stop(); } catch(e) {}
+
+        if (mediaStream) {
+            try {
+                mediaStream.getTracks().forEach(t => t.stop());
+            } catch(e) {}
+            mediaStream = null;
+        }
 
         scannerRodando = false;
-        candidatosLeitura = new Map();
+        scannerModo = null;
+        barcodeDetector = null;
+        candidatos = new Map();
+
         document.getElementById('modalScanner').style.display = 'none';
-        atualizarStatusScanner('Scanner encerrado.');
-        resetarViewportScanner();
+        resetarAreaScanner();
 
         if (!silencioso) {
-            // sem alertas
+            atualizarStatusScanner('Scanner encerrado');
         }
     }
 
     function buscarPorNome(nome) {
-        const nomeNormalizado = String(nome || '').trim().toLowerCase();
-        if (!nomeNormalizado) return;
-
-        const itemEncontrado = Object.entries(appData.catalogo).find(([ean, item]) =>
-            String(item.nome || '').trim().toLowerCase() === nomeNormalizado
+        const itemLocal = Object.entries(appData.catalogo).find(([ean, item]) =>
+            String(item.nome || '').trim().toLowerCase() === String(nome || '').trim().toLowerCase()
         );
 
-        if (itemEncontrado) {
-            const [ean, item] = itemEncontrado;
+        if (itemLocal) {
+            const [ean, item] = itemLocal;
             document.getElementById('prodEan').value = ean.startsWith('INT_') ? '' : ean;
             document.getElementById('prodValP').value = item.preco ?? '';
             document.getElementById('prodCatSelect').value = item.categoria ?? '';
@@ -480,30 +656,26 @@
     async function buscarPorEan(ean, contexto) {
         const codigo = somenteDigitos(ean);
         const prefix = contexto === 'lista' ? 'prod' : 'cat';
-        const campoCodigo = document.getElementById(prefix + 'Ean');
-        if (campoCodigo) campoCodigo.value = codigo;
+        const campoEan = document.getElementById(prefix + 'Ean');
+        if (campoEan) campoEan.value = codigo;
 
         if (!codigo || (codigo.length !== 8 && codigo.length !== 13)) return;
-        if (!codigoDeBarrasValido(codigo)) return;
+        if (!codigoValido(codigo)) return;
 
-        // 1. Busca local
         if (appData.catalogo[codigo]) {
             const item = appData.catalogo[codigo];
             document.getElementById(prefix + 'Nome').value = item.nome || '';
 
-            const campoPreco = document.getElementById(prefix + 'ValP') || document.getElementById(prefix + 'Preco');
-            if (campoPreco) campoPreco.value = item.preco ?? '';
+            const preco = document.getElementById(prefix + 'ValP') || document.getElementById(prefix + 'Preco');
+            if (preco) preco.value = item.preco ?? '';
 
-            const campoCat = document.getElementById(prefix + 'CatSelect');
-            if (campoCat) campoCat.value = item.categoria || '';
+            const cat = document.getElementById(prefix + 'CatSelect');
+            if (cat) cat.value = item.categoria || '';
             return;
         }
 
-        // 2. Busca online
         try {
-            const url = `https://world.openfoodfacts.net/api/v2/product/${codigo}?fields=product_name,product_name_pt,product_name_en,generic_name,generic_name_pt,brands`;
-            const res = await fetch(url);
-            if (!res.ok) throw new Error('Falha na consulta');
+            const res = await fetch(`https://world.openfoodfacts.net/api/v2/product/${codigo}?fields=product_name,product_name_pt,product_name_en,generic_name,generic_name_pt,brands`);
             const data = await res.json();
 
             if (data.status === 1 && data.product) {
@@ -514,7 +686,7 @@
                     p.product_name_en ||
                     p.generic_name_pt ||
                     p.generic_name ||
-                    '';
+                    "";
 
                 const marca = String(p.brands || '').split(',')[0].trim();
                 let nomeFinal = nomeBase.trim();
@@ -586,31 +758,27 @@
 
         cats.forEach(cat => {
             container.innerHTML += `<div class="category-header">${escapeHtml(cat)}</div>`;
-
             itens.filter(i => i.cat === cat).forEach(item => {
                 const idx = appData.listas[listaAtiva].indexOf(item);
-
                 container.innerHTML += `
                     <div class="item-row">
                         <div style="display:flex; justify-content:space-between; font-weight:bold;">
                             <span>${escapeHtml(item.nome)}</span>
                             <span onclick="appData.listas[listaAtiva].splice(${idx},1);salvar();renderItens();" style="color:red; cursor:pointer;">🗑️</span>
                         </div>
-
                         <div class="calc-grid">
-                            <input type="checkbox" ${item.noCarrinho ? 'checked' : ''} onclick="appData.listas[listaAtiva][${idx}].noCarrinho=!appData.listas[listaAtiva][${idx}].noCarrinho;salvar();">
+                            <input type="checkbox" ${item.noCarrinho?'checked':''} onclick="appData.listas[listaAtiva][${idx}].noCarrinho=!appData.listas[listaAtiva][${idx}].noCarrinho;salvar();">
                             <small>PREV</small>
                             <div>${item.qtdP}</div>
-                            <div>${formatarMoedaBr(item.valP)}</div>
-                            <div style="text-align:right">${formatarMoedaBr(item.qtdP * item.valP)}</div>
+                            <div>${Number(item.valP).toFixed(2)}</div>
+                            <div style="text-align:right">${(item.qtdP * item.valP).toFixed(2)}</div>
                         </div>
-
                         <div class="calc-grid" style="margin-top:5px;">
                             <div></div>
                             <small style="color:var(--s)">REAL</small>
-                            <input type="number" class="mini-input" value="${item.qtdR}" oninput="appData.listas[listaAtiva][${idx}].qtdR=parseFloat(this.value)||0;salvar();calcularTotais();renderItensParcialSemPiscar();">
-                            <input type="number" class="mini-input" value="${item.valR}" oninput="appData.listas[listaAtiva][${idx}].valR=parseFloat(this.value)||0;salvar();calcularTotais();renderItensParcialSemPiscar();">
-                            <div style="text-align:right; color:var(--s); font-weight:bold;">${formatarMoedaBr(item.qtdR * item.valR)}</div>
+                            <input type="number" class="mini-input" value="${item.qtdR}" oninput="appData.listas[listaAtiva][${idx}].qtdR=parseFloat(this.value)||0;salvar();calcularTotais();">
+                            <input type="number" class="mini-input" value="${item.valR}" oninput="appData.listas[listaAtiva][${idx}].valR=parseFloat(this.value)||0;salvar();calcularTotais();">
+                            <div style="text-align:right; color:var(--s); font-weight:bold;">${(item.qtdR * item.valR).toFixed(2)}</div>
                         </div>
                     </div>
                 `;
@@ -620,25 +788,13 @@
         calcularTotais();
     }
 
-    function renderItensParcialSemPiscar() {
-        const itens = appData.listas[listaAtiva] || [];
-        const linhas = document.querySelectorAll('.item-row');
-        itens.forEach((item, idx) => {
-            const totalReal = item.qtdR * item.valR;
-            if (linhas[idx]) {
-                const alvo = linhas[idx].querySelectorAll('.calc-grid')[1]?.querySelector('div:last-child');
-                if (alvo) alvo.textContent = formatarMoedaBr(totalReal);
-            }
-        });
-    }
-
     function calcularTotais() {
         const itens = appData.listas[listaAtiva] || [];
         const tP = itens.reduce((acc, i) => acc + (i.qtdP * i.valP), 0);
         const tR = itens.reduce((acc, i) => acc + (i.qtdR * i.valR), 0);
 
-        document.getElementById('totalPrevisto').innerText = `R$ ${formatarMoedaBr(tP)}`;
-        document.getElementById('totalReal').innerText = `R$ ${formatarMoedaBr(tR)}`;
+        document.getElementById('totalPrevisto').innerText = `R$ ${tP.toFixed(2)}`;
+        document.getElementById('totalReal').innerText = `R$ ${tR.toFixed(2)}`;
     }
 
     function compartilharWhatsApp() {
@@ -646,7 +802,7 @@
         let texto = `🛒 *LISTA: ${listaAtiva.toUpperCase()}*\n\n`;
 
         itens.forEach(i => {
-            texto += `${i.noCarrinho ? '✅' : '⬜'} *${i.nome}*\n   ${i.qtdR}x R$ ${formatarMoedaBr(i.valR)} = *R$ ${formatarMoedaBr(i.qtdR * i.valR)}*\n`;
+            texto += `${i.noCarrinho ? '✅' : '⬜'} *${i.nome}*\n   ${i.qtdR}x R$ ${Number(i.valR).toFixed(2)} = *R$ ${(i.qtdR * i.valR).toFixed(2)}*\n`;
         });
 
         texto += `\n💰 *TOTAL REAL: ${document.getElementById('totalReal').innerText}*`;
@@ -665,7 +821,7 @@
 
     function salvarNoCatalogo() {
         const eanDigitado = somenteDigitos(document.getElementById('catEan').value);
-        const ean = (eanDigitado.length === 8 || eanDigitado.length === 13) ? eanDigitado : ("INT_" + Date.now());
+        const ean = (eanDigitado.length === 8 || eanDigitado.length === 13) ? eanDigitado : "INT_" + Date.now();
 
         appData.catalogo[ean] = {
             nome: document.getElementById('catNome').value.trim(),
@@ -696,8 +852,9 @@
     }
 
     function renderCatsList() {
-        document.getElementById('listaCategoriasEdicao').innerHTML =
-            appData.categorias.map(c => `<div style="padding:10px; border-bottom:1px solid #eee">${escapeHtml(c)}</div>`).join('');
+        document.getElementById('listaCategoriasEdicao').innerHTML = appData.categorias.map(c =>
+            `<div style="padding:10px; border-bottom:1px solid #eee">${escapeHtml(c)}</div>`
+        ).join('');
     }
 
     function irParaHome() {
@@ -709,7 +866,7 @@
 
     function renderHome() {
         document.getElementById('listaDeArquivos').innerHTML = Object.keys(appData.listas).map(id => `
-            <div style="background:#fff; border:1px solid #ddd; padding:15px; border-radius:12px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; gap:12px;">
+            <div style="background:#fff; border:1px solid #ddd; padding:15px; border-radius:12px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
                 <b onclick="abrirLista(${JSON.stringify(id)})" style="flex:1; cursor:pointer;">${escapeHtml(id)}</b>
                 <span onclick="if(confirm('Apagar lista?')){delete appData.listas[${JSON.stringify(id)}]; salvar(); renderHome();}" style="color:red; margin-left:15px; cursor:pointer;">🗑️</span>
             </div>
@@ -727,10 +884,10 @@
                 appData = JSON.parse(decodeURIComponent(escape(atob(b))));
                 appData.listas = appData.listas || {};
                 appData.catalogo = appData.catalogo || {};
-                appData.categorias = Array.isArray(appData.categorias) && appData.categorias.length ? appData.categorias : [...CATS_PADRAO];
+                appData.categorias = appData.categorias || [...CATS_PADRAO];
                 salvar();
                 location.reload();
-            } catch (e) {
+            } catch(e) {
                 alert("Erro!");
             }
         }
