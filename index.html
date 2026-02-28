@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lista de Compras - Supermercado - Jrcollo - V37</title>
+    <title>Lista de Compras - Supermercado - Jrcollo - V38</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
     <style>
         :root {
@@ -534,7 +534,7 @@
 
     function defaultData() {
         return {
-            version: 37,
+            version: 38,
             listas: {},
             categorias: [...CATS_PADRAO],
             catalogo: {}
@@ -641,10 +641,39 @@
         return Number(v || 0).toFixed(2);
     }
 
+    function obterCatalogoOrdenado() {
+        const ordemCategorias = Array.isArray(appData.categorias) && appData.categorias.length
+            ? appData.categorias
+            : ["📦 Outros"];
+
+        return Object.keys(appData.catalogo)
+            .map(ean => ({ ean, item: appData.catalogo[ean] }))
+            .sort((a, b) => {
+                const catA = a.item?.categoria || "📦 Outros";
+                const catB = b.item?.categoria || "📦 Outros";
+
+                let idxA = ordemCategorias.indexOf(catA);
+                let idxB = ordemCategorias.indexOf(catB);
+
+                if (idxA === -1) idxA = 9999;
+                if (idxB === -1) idxB = 9999;
+
+                if (idxA !== idxB) return idxA - idxB;
+
+                return String(a.item?.nome || '').localeCompare(String(b.item?.nome || ''), 'pt-BR');
+            });
+    }
+
     function atualizarDatalist() {
         const dl = document.getElementById('sugestoes');
-        const nomes = Object.values(appData.catalogo).map(i => i.nome).filter(Boolean);
-        dl.innerHTML = [...new Set(nomes)].map(n => `<option value="${escapeHtml(n)}">`).join('');
+
+        const nomes = obterCatalogoOrdenado()
+            .map(x => x.item?.nome)
+            .filter(Boolean);
+
+        dl.innerHTML = [...new Set(nomes)]
+            .map(n => `<option value="${escapeHtml(n)}">`)
+            .join('');
     }
 
     function atualizarStatusScanner(msg) {
@@ -1600,21 +1629,20 @@
     }
 
     function renderCatalogo() {
-        const html = Object.keys(appData.catalogo).map(ean => {
-            const item = appData.catalogo[ean];
-            return `
-                <div class="catalog-card">
-                    <div>
-                        <div><b>${escapeHtml(item.nome || '')}</b></div>
-                        <div class="catalog-meta">
-                            EAN: ${escapeHtml(ean)} • ${escapeHtml(item.categoria || '📦 Outros')} • R$ ${formatarMoeda(item.preco)}
-                        </div>
+        const catalogoOrdenado = obterCatalogoOrdenado();
+
+        const html = catalogoOrdenado.map(({ ean, item }) => `
+            <div class="catalog-card">
+                <div>
+                    <div><b>${escapeHtml(item.nome || '')}</b></div>
+                    <div class="catalog-meta">
+                        EAN: ${escapeHtml(ean)} • ${escapeHtml(item.categoria || '📦 Outros')} • R$ ${formatarMoeda(item.preco)}
                     </div>
-                    <button type="button" class="icon-btn" onclick='abrirEditarCatalogo(${JSON.stringify(ean)})'>✏️</button>
-                    <button type="button" class="icon-btn danger" onclick='excluirDoCatalogo(${JSON.stringify(ean)})'>🗑️</button>
                 </div>
-            `;
-        }).join('');
+                <button type="button" class="icon-btn" onclick='abrirEditarCatalogo(${JSON.stringify(ean)})'>✏️</button>
+                <button type="button" class="icon-btn danger" onclick='excluirDoCatalogo(${JSON.stringify(ean)})'>🗑️</button>
+            </div>
+        `).join('');
 
         document.getElementById('listaItensCatalogo').innerHTML =
             html || `<div class="catalog-meta">Nenhum produto cadastrado ainda.</div>`;
