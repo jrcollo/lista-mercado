@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lista VIP - v29 Master</title>
+    <title>Lista VIP - v30 Flow</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
     <style>
         :root { --p: #6366f1; --s: #22c55e; --bg: #f1f5f9; --c: #ffffff; --text: #1e293b; }
@@ -13,15 +13,16 @@
         input, select { padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 16px; width: 100%; margin-bottom: 8px; box-sizing: border-box; }
         .btn { border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
         .btn-p { background: var(--p); color: white; width: 100%; }
-        .btn-w { background: #25d366; color: white; width: 100%; margin-top: 10px; }
+        .btn-w { background: #25d366; color: white; width: 100%; margin: 15px 0; }
         .btn-scan { background: #334155; color: white; width: 100%; margin-bottom: 10px; }
         .modal { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); display:none; align-items:center; justify-content:center; z-index: 10000; }
         .modal-content { background:white; padding:20px; border-radius:15px; width:90%; max-width:450px; position: relative; max-height: 85vh; overflow-y: auto; }
         .item-row { border-bottom: 2px solid #f1f5f9; padding: 12px 0; }
-        .category-header { background: #f1f5f9; padding: 8px; border-radius: 6px; font-weight: 800; margin-top: 10px; font-size: 0.8rem; color: var(--p); }
+        .category-header { background: #f1f5f9; padding: 8px; border-radius: 6px; font-weight: 800; margin-top: 15px; font-size: 0.75rem; color: var(--p); text-transform: uppercase; letter-spacing: 0.5px; }
         .calc-grid { display: grid; grid-template-columns: 30px 1.2fr 1fr 1fr 1fr; gap: 5px; align-items: center; font-size: 0.8rem; }
         .mini-input { padding: 6px; font-size: 0.85rem; border: 1px solid #e2e8f0; border-radius: 4px; text-align: right; width: 100%; }
         .footer-summary { position: sticky; bottom: 0; background: white; padding: 15px; border-top: 2px solid #e2e8f0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; border-radius: 10px 10px 0 0; }
+        .list-card { background:#fff; border:1px solid #ddd; padding:15px; border-radius:12px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
     </style>
 </head>
 <body>
@@ -34,7 +35,7 @@
             <button class="btn btn-p" onclick="criarNovaLista()" style="width:auto">Criar</button>
         </div>
         <div id="listaDeArquivos"></div>
-        <hr style="margin:20px 0; opacity:0.2">
+        <hr style="margin:25px 0; opacity:0.1">
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
             <button class="btn btn-scan" onclick="abrirModalCatalogo()" style="grid-column: span 2;">📦 Catálogo de Produtos</button>
             <button class="btn" style="background:#e2e8f0" onclick="abrirModalCats()">⚙️ Categorias</button>
@@ -49,15 +50,14 @@
             <h3 id="tituloListaAtual" style="margin:0; flex:1;"></h3>
         </div>
         <div style="background:#f8fafc; padding:15px; border-radius:12px; border:1px solid #e2e8f0; margin-bottom:15px;">
-            <button class="btn btn-scan" onclick="iniciarLeitor('lista')">📸 Scanear Código</button>
+            <button class="btn btn-scan" onclick="alert('Scanner em manutenção. Use a digitação.')">📸 Scanear Código</button>
             <input type="number" id="prodEan" placeholder="Código de Barras" oninput="buscarPorEan(this.value, 'lista')">
-            
             <input type="text" id="prodNome" list="sugestoes" placeholder="Nome do Produto" oninput="buscarPorNome(this.value)">
             <datalist id="sugestoes"></datalist>
 
             <div style="display:grid; grid-template-columns: 1.5fr 1fr 1.2fr; gap:8px;">
                 <select id="prodCatSelect"></select>
-                <input type="number" id="prodQtdP" value="1" placeholder="Qtd">
+                <input type="number" id="prodQtdP" value="1">
                 <input type="number" id="prodValP" placeholder="R$ Unit.">
                 <button class="btn btn-p" onclick="adicionarItem()" style="grid-column: span 3;">Adicionar à Lista</button>
             </div>
@@ -71,21 +71,25 @@
     </div>
 </div>
 
-<div id="modalScanner" class="modal">
-    <div id="interactive" style="width:100%; height:300px; background:#000;"></div>
-    <button class="btn" style="position:absolute; bottom:30px; background:red; color:#fff;" onclick="pararLeitor()">Cancelar</button>
-</div>
-
 <div id="modalCatalogo" class="modal">
     <div class="modal-content">
         <h3>📦 Catálogo</h3>
-        <input type="number" id="catEan" placeholder="EAN" oninput="buscarPorEan(this.value, 'catalogo')">
-        <input type="text" id="catNome" placeholder="Nome">
+        <input type="number" id="catEan" placeholder="Código EAN (Opcional)" oninput="buscarPorEan(this.value, 'catalogo')">
+        <input type="text" id="catNome" placeholder="Nome do Produto">
         <select id="catCatSelect"></select>
-        <input type="number" id="catPreco" placeholder="Preço R$">
-        <button class="btn btn-p" onclick="salvarNoCatalogo()">Salvar Item</button>
-        <div id="listaItensCatalogo" style="margin-top:15px;"></div>
+        <input type="number" id="catPreco" placeholder="Preço Sugerido R$">
+        <button class="btn btn-p" onclick="salvarNoCatalogo()">Salvar no Catálogo</button>
+        <hr style="margin:15px 0; opacity:0.2">
+        <div id="listaItensCatalogo"></div>
         <button class="btn" style="width:100%; margin-top:10px; background:#ddd" onclick="fecharModalCatalogo()">Fechar</button>
+    </div>
+</div>
+
+<div id="modalCats" class="modal">
+    <div class="modal-content">
+        <h3>⚙️ Categorias</h3>
+        <div id="listaCategoriasEdicao"></div>
+        <button class="btn" style="width:100%; margin-top:15px; background:#ddd" onclick="document.getElementById('modalCats').style.display='none'">Fechar</button>
     </div>
 </div>
 
@@ -101,7 +105,6 @@
         atualizarDatalist();
     }
 
-    // --- AUTOCOMPLETE E BUSCA ---
     function atualizarDatalist() {
         const dl = document.getElementById('sugestoes');
         const nomes = Object.values(appData.catalogo).map(i => i.nome);
@@ -117,17 +120,15 @@
     }
 
     async function buscarPorEan(ean, contexto) {
+        if(!ean) return;
         const prefix = contexto === 'lista' ? 'prod' : 'cat';
-        // Busca local
         if(appData.catalogo[ean]) {
             const item = appData.catalogo[ean];
             document.getElementById(prefix+'Nome').value = item.nome;
             const campoPreco = document.getElementById(prefix+'ValP') || document.getElementById(prefix+'Preco');
             campoPreco.value = item.preco;
             document.getElementById(prefix+'CatSelect').value = item.categoria;
-        } 
-        // Busca Web
-        else if(ean.length === 8 || ean.length === 13) {
+        } else if(ean.length === 8 || ean.length === 13) {
             try {
                 const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${ean}.json`);
                 const data = await res.json();
@@ -136,10 +137,15 @@
         }
     }
 
-    // --- LISTAS ---
     function criarNovaLista() {
         const n = document.getElementById('novaListaNome').value.trim();
-        if(n) { appData.listas[n] = []; salvar(); renderHome(); abrirLista(n); }
+        if(n) { 
+            appData.listas[n] = []; 
+            salvar(); 
+            renderHome(); 
+            abrirLista(n); 
+            document.getElementById('novaListaNome').value = "";
+        }
     }
 
     function abrirLista(id) {
@@ -155,13 +161,24 @@
         const nome = document.getElementById('prodNome').value;
         if(!nome) return;
         appData.listas[listaAtiva].push({
-            nome, ean: document.getElementById('prodEan').value, cat: document.getElementById('prodCatSelect').value,
+            nome, 
+            ean: document.getElementById('prodEan').value, 
+            cat: document.getElementById('prodCatSelect').value,
             qtdP: parseFloat(document.getElementById('prodQtdP').value) || 1,
             valP: parseFloat(document.getElementById('prodValP').value) || 0,
-            qtdR: parseFloat(document.getElementById('prodQtdP').value) || 1, valR: 0, noCarrinho: false
+            qtdR: parseFloat(document.getElementById('prodQtdP').value) || 1, 
+            valR: 0, 
+            noCarrinho: false
         });
-        salvar(); renderItens();
-        document.getElementById('prodNome').value = ""; document.getElementById('prodEan').value = "";
+        salvar(); 
+        renderItens();
+        
+        // --- LIMPEZA DE CAMPOS (NOVO) ---
+        document.getElementById('prodNome').value = "";
+        document.getElementById('prodEan').value = "";
+        document.getElementById('prodValP').value = "";
+        document.getElementById('prodQtdP').value = "1";
+        document.getElementById('prodNome').focus(); // Foca no nome para o próximo item
     }
 
     function renderItens() {
@@ -199,9 +216,9 @@
         document.getElementById('totalReal').innerText = `R$ ${tR.toFixed(2)}`;
     }
 
-    // --- WHATSAPP ---
     function compartilharWhatsApp() {
         const itens = appData.listas[listaAtiva];
+        if(!itens || itens.length === 0) return alert("Lista vazia!");
         let texto = `🛒 *LISTA: ${listaAtiva.toUpperCase()}*\n\n`;
         itens.forEach(i => {
             texto += `${i.noCarrinho ? '✅' : '⬜'} *${i.nome}*\n   ${i.qtdR}x R$ ${i.valR.toFixed(2)} = *R$ ${(i.qtdR*i.valR).toFixed(2)}*\n`;
@@ -210,41 +227,58 @@
         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`);
     }
 
-    // --- MODAIS E HOME ---
     function abrirModalCatalogo() { 
         document.getElementById('modalCatalogo').style.display='flex'; 
         document.getElementById('catCatSelect').innerHTML = appData.categorias.map(c => `<option value="${c}">${c}</option>`).join('');
         renderCatalogo(); 
     }
     function fecharModalCatalogo() { document.getElementById('modalCatalogo').style.display='none'; }
+    
     function salvarNoCatalogo() {
         const ean = document.getElementById('catEan').value || "INT_"+Date.now();
+        const nome = document.getElementById('catNome').value;
+        if(!nome) return alert("Dê um nome ao produto!");
+        
         appData.catalogo[ean] = { 
-            nome: document.getElementById('catNome').value, 
+            nome: nome, 
             preco: parseFloat(document.getElementById('catPreco').value)||0, 
             categoria: document.getElementById('catCatSelect').value 
         };
-        salvar(); renderCatalogo();
-    }
-    function renderCatalogo() {
-        document.getElementById('listaItensCatalogo').innerHTML = Object.keys(appData.catalogo).map(ean => `<div style="display:flex; justify-content:space-between; padding:5px; font-size:12px; border-bottom:1px solid #eee"><span>${appData.catalogo[ean].nome}</span><b onclick="delete appData.catalogo['${ean}']; salvar(); renderCatalogo();" style="color:red">X</b></div>`).join('');
+        salvar(); 
+        renderCatalogo();
+
+        // --- LIMPEZA DE CAMPOS (NOVO) ---
+        document.getElementById('catEan').value = "";
+        document.getElementById('catNome').value = "";
+        document.getElementById('catPreco').value = "";
+        alert("Produto salvo com sucesso!");
     }
 
+    function renderCatalogo() {
+        const catList = document.getElementById('listaItensCatalogo');
+        const keys = Object.keys(appData.catalogo);
+        catList.innerHTML = keys.length === 0 ? "<small>Nenhum item salvo</small>" : keys.map(ean => `
+            <div style="display:flex; justify-content:space-between; padding:8px; font-size:13px; border-bottom:1px solid #eee; align-items:center;">
+                <span>${appData.catalogo[ean].nome}</span>
+                <b onclick="if(confirm('Excluir?')){delete appData.catalogo['${ean}']; salvar(); renderCatalogo();}" style="color:red; padding:5px">✕</b>
+            </div>`).join('');
+    }
+
+    function abrirModalCats() { document.getElementById('modalCats').style.display='flex'; renderCatsList(); }
+    function renderCatsList() { document.getElementById('listaCategoriasEdicao').innerHTML = appData.categorias.map((c, i) => `<div style="padding:12px; border-bottom:1px solid #eee; display:flex; justify-content:space-between"><span>${c}</span></div>`).join(''); }
+    
     function irParaHome() { document.getElementById('screenEditor').classList.remove('active'); document.getElementById('screenHome').classList.add('active'); renderHome(); }
     function renderHome() {
         document.getElementById('listaDeArquivos').innerHTML = Object.keys(appData.listas).map(id => `
-            <div style="background:#fff; border:1px solid #ddd; padding:12px; border-radius:12px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center">
+            <div class="list-card">
                 <b onclick="abrirLista('${id}')" style="flex:1">${id}</b>
-                <span onclick="if(confirm('Apagar lista?')){delete appData.listas['${id}']; salvar(); renderHome();}" style="color:red; margin-left:15px">🗑️</span>
+                <span onclick="if(confirm('Apagar lista?')){delete appData.listas['${id}']; salvar(); renderHome();}" style="color:red; margin-left:15px; font-size:1.2rem">🗑️</span>
             </div>`).join('');
     }
 
     function exportarBackup() { prompt("Copie seu Backup:", btoa(unescape(encodeURIComponent(JSON.stringify(appData))))); }
-    function importarBackup() { const b = prompt("Cole seu Backup:"); if(b){ appData=JSON.parse(decodeURIComponent(escape(atob(b)))); salvar(); location.reload(); }}
+    function importarBackup() { const b = prompt("Cole seu Backup:"); if(b){ try{appData=JSON.parse(decodeURIComponent(escape(atob(b)))); salvar(); location.reload();}catch(e){alert("Erro no código!")} }}
     
-    // Scanner simplificado para não travar
-    function iniciarLeitor(a) { alert("Ajustando scanner para próxima versão. Por favor, use digitação por enquanto."); }
-
     renderHome();
     atualizarDatalist();
 </script>
