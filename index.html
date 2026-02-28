@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lista VIP - v31 Scanner Pro</title>
+    <title>Lista Compras - Mercado - v32 FixedScan</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
     <style>
         :root { --p: #6366f1; --s: #22c55e; --bg: #f1f5f9; --c: #ffffff; --text: #1e293b; }
@@ -16,14 +16,19 @@
         .btn-w { background: #25d366; color: white; width: 100%; margin: 15px 0; }
         .btn-scan { background: #334155; color: white; width: 100%; margin-bottom: 10px; }
         
-        /* Layout do Scanner Profissional */
-        .modal { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); display:none; flex-direction: column; z-index: 10000; }
-        #interactive.viewport { width: 100%; height: 60vh; background: #000; position: relative; overflow: hidden; }
-        #interactive.viewport video, canvas { width: 100%; height: 100%; object-fit: cover; position: absolute; top:0; left:0; }
-        .scan-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; height: 150px; border: 2px solid var(--s); border-radius: 10px; z-index: 10; box-shadow: 0 0 0 1000px rgba(0,0,0,0.5); }
+        /* LAYOUT SCANNER CORRIGIDO */
+        .modal-scanner { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); display:none; flex-direction: column; z-index: 99999; }
+        #interactive.viewport { width: 100%; height: 70vh; background: #000; position: relative; overflow: hidden; }
+        #interactive.viewport video, canvas { width: 100%; height: 100%; object-fit: cover; }
+        .scan-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; height: 120px; border: 2px solid var(--s); border-radius: 10px; z-index: 10; box-shadow: 0 0 0 1000px rgba(0,0,0,0.5); }
         .scan-line { position: absolute; width: 100%; height: 2px; background: red; top: 50%; box-shadow: 0 0 8px red; animation: scanAnim 2s infinite; z-index: 11; }
         @keyframes scanAnim { 0% { top: 0%; } 50% { top: 100%; } 100% { top: 0%; } }
-
+        .scanner-footer { background:#000; padding:20px; text-align:center; flex:1; display:flex; flex-direction:column; justify-content:center; }
+        
+        /* OUTROS MODAIS */
+        .modal { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:none; justify-content:center; align-items:center; z-index: 9000; }
+        .modal-content { background:#fff; width:90%; max-width:450px; padding:20px; border-radius:15px; max-height:85vh; overflow-y:auto; }
+        
         .item-row { border-bottom: 2px solid #f1f5f9; padding: 12px 0; }
         .category-header { background: #f1f5f9; padding: 8px; border-radius: 6px; font-weight: 800; margin-top: 15px; font-size: 0.75rem; color: var(--p); text-transform: uppercase; }
         .calc-grid { display: grid; grid-template-columns: 30px 1.2fr 1fr 1fr 1fr; gap: 5px; align-items: center; font-size: 0.8rem; }
@@ -35,7 +40,7 @@
 
 <div class="app-container">
     <div id="screenHome" class="screen active">
-        <h2 style="text-align:center">🛒 Lista VIP v31</h2>
+        <h2 style="text-align:center">🛒 Lista VIP v32</h2>
         <div style="display:flex; gap:8px; margin-bottom:20px;">
             <input type="text" id="novaListaNome" placeholder="Nome da Lista">
             <button class="btn btn-p" onclick="criarNovaLista()" style="width:auto">Criar</button>
@@ -76,18 +81,18 @@
     </div>
 </div>
 
-<div id="modalScanner" class="modal">
+<div id="modalScanner" class="modal-scanner">
     <div id="interactive" class="viewport">
         <div class="scan-overlay"><div class="scan-line"></div></div>
     </div>
-    <div style="background:#000; padding:20px; text-align:center; flex:1;">
-        <p style="color:#fff; margin-bottom:15px;">Centralize o código de barras</p>
-        <button class="btn" style="background:#ef4444; color:#fff; width:100%" onclick="pararLeitor()">Cancelar</button>
+    <div class="scanner-footer">
+        <p style="color:#fff; margin-bottom:15px; font-size:14px;">Ajuste o código dentro do retângulo</p>
+        <button class="btn" style="background:#ef4444; color:#fff; width:100%; padding:15px" onclick="pararLeitor()">Cancelar</button>
     </div>
 </div>
 
-<div id="modalCatalogo" class="modal" style="background:rgba(0,0,0,0.8); display:none; justify-content:center; align-items:center;">
-    <div class="modal-content" style="background:#fff; width:90%; padding:20px; border-radius:15px;">
+<div id="modalCatalogo" class="modal">
+    <div class="modal-content">
         <h3>📦 Catálogo</h3>
         <button class="btn btn-scan" onclick="iniciarLeitor('catalogo')">📸 Scanear p/ Catálogo</button>
         <input type="number" id="catEan" placeholder="Código EAN" oninput="buscarPorEan(this.value, 'catalogo')">
@@ -100,8 +105,8 @@
     </div>
 </div>
 
-<div id="modalCats" class="modal" style="background:rgba(0,0,0,0.8); display:none; justify-content:center; align-items:center;">
-    <div class="modal-content" style="background:#fff; width:90%; padding:20px; border-radius:15px;">
+<div id="modalCats" class="modal">
+    <div class="modal-content">
         <h3>⚙️ Categorias</h3>
         <div id="listaCategoriasEdicao"></div>
         <button class="btn" style="width:100%; margin-top:15px; background:#ddd" onclick="document.getElementById('modalCats').style.display='none'">Fechar</button>
@@ -109,7 +114,7 @@
 </div>
 
 <script>
-    const KEY = 'app_v29_storage'; // CHAVE MANTIDA PARA NÃO PERDER DADOS
+    const KEY = 'app_v29_storage';
     const CATS_PADRAO = ["🛒 Mercearia", "🍎 Hortifruti", "🥩 Açougue", "🥖 Padaria", "🧀 Frios/Laticínios", "❄️ Congelados", "🥤 Bebidas", "🧼 Higiene", "🧹 Limpeza", "🏠 Utilidades Domésticas", "🐾 Pet Shop", "👧 Lanche Crianças", "📦 Outros"];
 
     let appData = JSON.parse(localStorage.getItem(KEY)) || { listas: {}, categorias: CATS_PADRAO, catalogo: {} };
@@ -140,8 +145,8 @@
                     resolution: { width: 1280, height: 720 }
                 },
             },
-            locator: { patchSize: "medium", halfSample: true },
-            decoder: { readers: ["ean_reader", "ean_8_reader", "code_128_reader"] },
+            locator: { patchSize: "large", halfSample: false }, // Configuração para melhor detecção
+            decoder: { readers: ["ean_reader", "ean_8_reader"] },
             locate: true
         }, function(err) {
             if (err) { alert("Erro ao abrir câmera: " + err); return; }
@@ -152,14 +157,9 @@
         let count = 0;
         Quagga.onDetected(data => {
             let code = data.codeResult.code;
-            if(code === lastCode) {
-                count++;
-            } else {
-                lastCode = code;
-                count = 0;
-            }
+            if(code === lastCode) { count++; } else { lastCode = code; count = 0; }
 
-            if(count >= 3) { // Leitura estável
+            if(count >= 3) {
                 if (navigator.vibrate) navigator.vibrate(100);
                 pararLeitor();
                 const campo = scannerAlvo === 'lista' ? 'prodEan' : 'catEan';
