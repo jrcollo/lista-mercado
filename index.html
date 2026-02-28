@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lista VIP - v22 Pro</title>
+    <title>Lista VIP - v23 Final</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
     <style>
         :root { --p: #6366f1; --s: #22c55e; --d: #ef4444; --bg: #f1f5f9; --c: #ffffff; --text: #1e293b; }
@@ -15,7 +15,6 @@
         .btn-p { background: var(--p); color: white; width: 100%; }
         .btn-scan { background: #334155; color: white; width: 100%; margin-bottom: 10px; }
         
-        /* CAMADAS DE PRIORIDADE MÁXIMA */
         .modal { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); display:none; align-items:center; justify-content:center; z-index: 5000; padding: 15px; box-sizing: border-box; }
         #modalScanner { z-index: 99999 !important; background: #000; }
         
@@ -79,11 +78,8 @@
 <div id="modalScanner" class="modal">
     <div style="width: 100%; max-width: 400px; padding: 20px;">
         <div id="interactive" class="viewport"><div class="scanner-laser"></div></div>
-        <p style="text-align:center; color: white; font-size: 14px; margin: 15px 0;">Alinhe o código de barras no centro</p>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <button class="btn" style="background: #555; color: white;" onclick="pararLeitor()">Cancelar</button>
-            <button class="btn" style="background: var(--s); color: white;" onclick="tentarForcarLeitura()">Forçar Leitura</button>
-        </div>
+        <p style="text-align:center; color: white; font-size: 14px; margin: 15px 0;">Foque o código de barras</p>
+        <button class="btn" style="background: #555; color: white; width: 100%;" onclick="pararLeitor()">Cancelar</button>
     </div>
 </div>
 
@@ -91,7 +87,7 @@
     <div class="modal-content">
         <h3>📦 Catálogo de Produtos</h3>
         <button class="btn btn-scan" onclick="iniciarLeitor('catalogo')">📸 Scanear Código</button>
-        <div id="loadingEan" style="display:none; color: var(--p); font-size: 12px; font-weight: bold; margin-bottom: 5px;">🔍 Buscando...</div>
+        <div id="loadingEan" style="display:none; color: var(--p); font-size: 12px; font-weight: bold;">🔍 Buscando...</div>
         <div style="background: #f1f5f9; padding: 10px; border-radius: 10px; margin-bottom: 15px;">
             <input type="text" id="catEan" placeholder="EAN">
             <input type="text" id="catNome" placeholder="Nome do Produto">
@@ -114,12 +110,12 @@
 </div>
 
 <script>
-    const KEY = 'app_v22_dados';
+    const KEY = 'app_v23_dados';
     const CATEGORIAS_PADRAO = [
         "🛒 Mercearia", "🍎 Hortifruti", "🥩 Açougue", "🥖 Padaria", 
         "🧀 Frios/Laticínios", "❄️ Congelados", "🥤 Bebidas", 
         "🧼 Higiene", "🧹 Limpeza", "🏠 Utilidades Domésticas", 
-        "🐾 Pet Shop", "👧 Lanche Crianças"
+        "🐾 Pet Shop", "👧 Lanche Crianças", "📦 Outros"
     ];
 
     let appData = JSON.parse(localStorage.getItem(KEY)) || {
@@ -128,8 +124,10 @@
         catalogo: {}
     };
 
-    // Atualiza categorias se a lista estiver vazia ou for a antiga
-    if(appData.categorias.length < 10) appData.categorias = CATEGORIAS_PADRAO;
+    // Forçar atualização das categorias se houver mudança na lista padrão
+    if (appData.categorias.length !== CATEGORIAS_PADRAO.length) {
+        appData.categorias = CATEGORIAS_PADRAO;
+    }
 
     function salvar() { 
         localStorage.setItem(KEY, JSON.stringify(appData));
@@ -152,7 +150,7 @@
             if (data.status === 1) {
                 document.getElementById('catNome').value = data.product.product_name || data.product.generic_name || "";
             }
-        } catch (e) { console.error("Erro busca"); }
+        } catch (e) {}
         document.getElementById('loadingEan').style.display = 'none';
     }
 
@@ -177,61 +175,36 @@
         }
     }
 
-    // --- SCANNER v22 ---
     let scannerAlvo = 'lista';
     function iniciarLeitor(alvo) {
         scannerAlvo = alvo;
         document.getElementById('modalScanner').style.display = 'flex';
-        
         Quagga.init({
-            inputStream: {
-                name: "Live", type: "LiveStream", target: document.querySelector('#interactive'),
-                constraints: { facingMode: "environment", focusMode: "continuous" },
-            },
+            inputStream: { name: "Live", type: "LiveStream", target: document.querySelector('#interactive'), constraints: { facingMode: "environment" } },
             decoder: { readers: ["ean_reader", "ean_8_reader"] }
         }, (err) => {
-            if (err) { alert("Câmera bloqueada ou não encontrada."); return; }
+            if (err) return;
             Quagga.start();
         });
-
         Quagga.onDetected(processarLeitura);
     }
 
     function processarLeitura(data) {
         const code = data.codeResult.code;
         if (code.length === 13 || code.length === 8) {
-            Quagga.offDetected(); 
-            Quagga.stop();
+            if (navigator.vibrate) navigator.vibrate(100);
+            Quagga.offDetected(); Quagga.stop();
             document.getElementById('modalScanner').style.display = 'none';
-            executarResultado(code);
+            if (scannerAlvo === 'catalogo') { 
+                document.getElementById('catEan').value = code; 
+                autoPreencher(code, 'catalogo'); 
+            } else { 
+                autoPreencher(code, 'lista'); 
+            }
         }
     }
 
-    function tentarForcarLeitura() {
-        // Tira uma "foto" do vídeo atual e tenta ler com mais calma
-        const canvas = Quagga.canvas.dom.image;
-        if (canvas) {
-            // Força a detecção manual na imagem atual
-            const code = "7896034610024"; // Fallback para teste ou lógica de leitura estática
-            // (Na prática, o Quagga já tenta isso, mas o botão dá feedback ao usuário)
-            alert("Ajuste o foco e tente novamente. Dica: Afaste um pouco o celular.");
-        }
-    }
-
-    function executarResultado(code) {
-        if (scannerAlvo === 'catalogo') { 
-            document.getElementById('catEan').value = code; 
-            autoPreencher(code, 'catalogo'); 
-        } else { 
-            autoPreencher(code, 'lista'); 
-        }
-    }
-
-    function pararLeitor() {
-        Quagga.offDetected();
-        Quagga.stop();
-        document.getElementById('modalScanner').style.display = 'none';
-    }
+    function pararLeitor() { Quagga.offDetected(); Quagga.stop(); document.getElementById('modalScanner').style.display = 'none'; }
 
     function abrirModalCatalogo() { 
         document.getElementById('modalCatalogo').style.display = 'flex'; 
@@ -304,6 +277,7 @@
         const container = document.getElementById('corpoLista'); container.innerHTML = "";
         const itens = appData.listas[listaAtiva];
         const cats = [...new Set(itens.map(i => i.cat))];
+        cats.sort((a, b) => CATEGORIAS_PADRAO.indexOf(a) - CATEGORIAS_PADRAO.indexOf(b));
         cats.forEach(cat => {
             container.innerHTML += `<div class="category-header">${cat}</div>`;
             itens.filter(i => i.cat === cat).forEach(item => {
@@ -312,46 +286,4 @@
                 <div class="item-row">
                     <div style="display:flex; justify-content:space-between; font-weight:bold; margin-bottom:5px;">
                         <span>${item.nome}</span>
-                        <span onclick="appData.listas[listaAtiva].splice(${idx},1);salvar();renderItens();" style="color:red">🗑️</span>
-                    </div>
-                    <div class="calc-grid">
-                        <input type="checkbox" ${item.noCarrinho?'checked':''} onclick="appData.listas[listaAtiva][${idx}].noCarrinho=!appData.listas[listaAtiva][${idx}].noCarrinho;salvar();">
-                        <div style="font-size:0.6rem">PREV.</div><div>${item.qtdP}</div><div>${item.valP.toFixed(2)}</div><div style="text-align:right">${(item.qtdP*item.valP).toFixed(2)}</div>
-                    </div>
-                    <div class="calc-grid" style="font-weight:bold; margin-top:5px;">
-                        <div></div><div style="font-size:0.6rem; color:var(--s)">REAL</div>
-                        <div><input type="number" class="mini-input" value="${item.qtdR}" oninput="appData.listas[listaAtiva][${idx}].qtdR=parseFloat(this.value)||0;salvar();calcularTotais();"></div>
-                        <div><input type="number" class="mini-input" value="${item.valR}" oninput="appData.listas[listaAtiva][${idx}].valR=parseFloat(this.value)||0;salvar();calcularTotais();"></div>
-                        <div style="text-align:right; color:var(--s)">${(item.qtdR*item.valR).toFixed(2)}</div>
-                    </div>
-                </div>`;
-            });
-        });
-        calcularTotais();
-    }
-    function calcularTotais() {
-        const itens = appData.listas[listaAtiva] || [];
-        const tP = itens.reduce((acc, i) => acc + (i.qtdP * i.valP), 0);
-        const tR = itens.reduce((acc, i) => acc + (i.qtdR * i.valR), 0);
-        document.getElementById('totalPrevisto').innerText = `R$ ${tP.toFixed(2)}`;
-        document.getElementById('totalReal').innerText = `R$ ${tR.toFixed(2)}`;
-    }
-
-    function irParaHome() { document.getElementById('screenEditor').classList.remove('active'); document.getElementById('screenHome').classList.add('active'); renderHome(); }
-    function renderHome() {
-        document.getElementById('listaDeArquivos').innerHTML = Object.keys(appData.listas).map(id => `
-            <div class="list-card">
-                <b onclick="abrirLista('${id}')" style="flex:1">${id}</b>
-                <span>
-                    <b onclick="if(confirm('Apagar lista?')){delete appData.listas['${id}']; salvar(); renderHome();}" style="color:red">🗑️</b>
-                </span>
-            </div>`).join('');
-    }
-
-    function exportarBackup() { prompt("Copie o backup:", btoa(unescape(encodeURIComponent(JSON.stringify(appData))))); }
-    function importarBackup() { const c = prompt("Cole o backup:"); if(c){ appData=JSON.parse(decodeURIComponent(escape(atob(c)))); salvar(); location.reload(); }}
-
-    renderHome();
-</script>
-</body>
-</html>
+                        <span onclick="appData.listas[listaAtiva].splice(${idx},1);salvar();renderItens();" style="color:red
