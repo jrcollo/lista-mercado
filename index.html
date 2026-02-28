@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lista VIP - v24 Fixed</title>
+    <title>Lista VIP - v25 Ultra</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
     <style>
         :root { --p: #6366f1; --s: #22c55e; --d: #ef4444; --bg: #f1f5f9; --c: #ffffff; --text: #1e293b; }
@@ -11,21 +11,19 @@
         .app-container { background: var(--c); padding: 15px; border-radius: 20px; width: 100%; max-width: 600px; min-height: 95vh; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
         .screen { display: none; } .screen.active { display: block; }
         input, select { padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 16px; width: 100%; margin-bottom: 8px; box-sizing: border-box; }
-        .btn { border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
+        .btn { border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .btn-p { background: var(--p); color: white; width: 100%; }
         .btn-scan { background: #334155; color: white; width: 100%; margin-bottom: 10px; }
-        .modal { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); display:none; align-items:center; justify-content:center; z-index: 5000; padding: 15px; box-sizing: border-box; }
-        #modalScanner { z-index: 99999 !important; background: #000; }
+        .modal { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); display:none; align-items:center; justify-content:center; z-index: 10000; padding: 15px; }
         .modal-content { background:white; padding:20px; border-radius:15px; width:100%; max-width:450px; position: relative; max-height: 90vh; overflow-y: auto; }
-        #interactive.viewport { width: 100%; height: 300px; border-radius: 12px; overflow: hidden; background: #000; position: relative; border: 2px solid var(--p); }
+        #interactive.viewport { width: 100%; height: 250px; border-radius: 12px; overflow: hidden; background: #000; position: relative; border: 3px solid var(--p); }
         #interactive.viewport video, canvas { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; }
         .scanner-laser { position: absolute; top: 50%; left: 10%; width: 80%; height: 2px; background: red; box-shadow: 0 0 8px red; z-index: 10; animation: laser 2s infinite; }
-        @keyframes laser { 0%, 100% { top: 20%; } 50% { top: 80%; } }
-        .list-card { background: white; border: 1px solid #e2e8f0; padding: 12px; border-radius: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        @keyframes laser { 0%, 100% { top: 30%; } 50% { top: 70%; } }
+        .category-header { background: #f1f5f9; padding: 10px; border-radius: 8px; font-weight: 800; margin-top: 15px; font-size: 0.8rem; color: var(--p); border-left: 4px solid var(--p); }
         .item-row { border-bottom: 2px solid #f1f5f9; padding: 12px 0; }
         .calc-grid { display: grid; grid-template-columns: 30px 1.2fr 1fr 1fr 1fr; gap: 5px; align-items: center; font-size: 0.8rem; }
         .mini-input { padding: 6px; font-size: 0.85rem; border: 1px solid #e2e8f0; border-radius: 4px; text-align: right; width: 100%; }
-        .category-header { background: #f1f5f9; padding: 10px; border-radius: 8px; font-weight: 800; margin-top: 15px; font-size: 0.8rem; color: var(--p); border-left: 4px solid var(--p); }
         .footer-summary { position: sticky; bottom: 0; background: white; padding: 15px; border-top: 2px solid #e2e8f0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; border-radius: 10px 10px 0 0;}
     </style>
 </head>
@@ -35,32 +33,30 @@
     <div id="screenHome" class="screen active">
         <h2 style="text-align:center">🛒 Minhas Compras</h2>
         <div style="display:flex; gap:8px; margin-bottom:20px;">
-            <input type="text" id="novaListaNome" placeholder="Ex: Rancho">
+            <input type="text" id="novaListaNome" placeholder="Ex: Mercado">
             <button class="btn btn-p" onclick="criarNovaLista()" style="width:auto">Criar</button>
         </div>
         <div id="listaDeArquivos"></div>
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:20px;">
             <button class="btn btn-scan" onclick="abrirModalCatalogo()">📦 Catálogo</button>
             <button class="btn" style="background:#e2e8f0" onclick="abrirModalCats()">⚙️ Categorias</button>
-            <button class="btn" style="background:#f1f5f9; font-size: 0.7rem" onclick="exportarBackup()">📤 Backup</button>
-            <button class="btn" style="background:#f1f5f9; font-size: 0.7rem" onclick="importarBackup()">📥 Restaurar</button>
         </div>
     </div>
 
     <div id="screenEditor" class="screen">
         <div style="display:flex; align-items:center; gap:10px; margin-bottom:15px;">
             <button class="btn" onclick="irParaHome()">←</button>
-            <h3 id="tituloListaAtual" style="margin:0; flex:1; font-size: 1.1rem;"></h3>
+            <h3 id="tituloListaAtual" style="margin:0; flex:1;"></h3>
         </div>
         <div style="background:#f8fafc; padding:15px; border-radius:12px; border:1px solid #e2e8f0; margin-bottom:15px;">
             <button class="btn btn-scan" onclick="iniciarLeitor('lista')">📸 Scanear Produto</button>
-            <input type="text" id="prodNome" list="sugestoesProdutos" placeholder="Nome ou EAN..." oninput="autoPreencher(this.value, 'lista')">
-            <datalist id="sugestoesProdutos"></datalist>
+            <input type="text" id="prodEan" placeholder="Código EAN" oninput="autoPreencher(this.value, 'lista')">
+            <input type="text" id="prodNome" placeholder="Nome do Produto">
             <div style="display:grid; grid-template-columns: 1.5fr 1fr 1.2fr; gap:8px;">
                 <select id="prodCatSelect"></select>
-                <input type="number" id="prodQtdP" placeholder="Qtd" value="1">
-                <input type="number" id="prodValP" placeholder="R$ Unit.">
-                <button class="btn btn-p" onclick="adicionarItem()" style="grid-column: span 3;">Adicionar à Lista</button>
+                <input type="number" id="prodQtdP" value="1">
+                <input type="number" id="prodValP" placeholder="R$">
+                <button class="btn btn-p" onclick="adicionarItem()" style="grid-column: span 3;">Adicionar</button>
             </div>
         </div>
         <div id="corpoLista"></div>
@@ -74,23 +70,22 @@
 <div id="modalScanner" class="modal">
     <div style="width: 100%; max-width: 400px; padding: 20px;">
         <div id="interactive" class="viewport"><div class="scanner-laser"></div></div>
-        <p style="text-align:center; color: white; font-size: 14px; margin: 15px 0;">Foque o código de barras</p>
+        <p style="text-align:center; color: white; margin: 15px 0;">Centralize o código de barras</p>
         <button class="btn" style="background: #555; color: white; width: 100%;" onclick="pararLeitor()">Cancelar</button>
     </div>
 </div>
 
 <div id="modalCatalogo" class="modal">
     <div class="modal-content">
-        <h3>📦 Catálogo de Produtos</h3>
-        <button class="btn btn-scan" onclick="iniciarLeitor('catalogo')">📸 Scanear Código</button>
-        <div id="loadingEan" style="display:none; color: var(--p); font-size: 12px; font-weight: bold;">🔍 Buscando...</div>
-        <div style="background: #f1f5f9; padding: 10px; border-radius: 10px; margin-bottom: 15px;">
-            <input type="text" id="catEan" placeholder="EAN">
-            <input type="text" id="catNome" placeholder="Nome do Produto">
-            <select id="catCatSelect"></select>
-            <input type="number" id="catPreco" placeholder="Preço R$">
-            <button class="btn btn-p" onclick="salvarNoCatalogo()">Salvar Item</button>
-        </div>
+        <h3>📦 Catálogo</h3>
+        <button class="btn btn-scan" onclick="iniciarLeitor('catalogo')">📸 Scanear</button>
+        <div id="loadingEan" style="display:none; color: var(--p); font-size: 12px;">🔍 Buscando nome...</div>
+        <input type="text" id="catEan" placeholder="EAN" oninput="autoPreencher(this.value, 'catalogo')">
+        <input type="text" id="catNome" placeholder="Nome">
+        <select id="catCatSelect"></select>
+        <input type="number" id="catPreco" placeholder="Preço R$">
+        <button class="btn btn-p" onclick="salvarNoCatalogo()">Salvar no Catálogo</button>
+        <hr>
         <div id="listaItensCatalogo"></div>
         <button class="btn" style="width:100%; margin-top:10px; background:#ddd" onclick="fecharModalCatalogo()">Fechar</button>
     </div>
@@ -106,7 +101,7 @@
 </div>
 
 <script>
-    const KEY = 'app_v24_storage'; // Chave nova para evitar conflito com dados corrompidos
+    const KEY = 'app_v25_final_data';
     const CATEGORIAS_PADRAO = [
         "🛒 Mercearia", "🍎 Hortifruti", "🥩 Açougue", "🥖 Padaria", 
         "🧀 Frios/Laticínios", "❄️ Congelados", "🥤 Bebidas", 
@@ -115,54 +110,41 @@
     ];
 
     let appData = JSON.parse(localStorage.getItem(KEY)) || {
-        listas: {},
-        categorias: CATEGORIAS_PADRAO,
-        catalogo: {}
+        listas: {}, categorias: CATEGORIAS_PADRAO, catalogo: {}
     };
 
-    function salvar() { 
-        localStorage.setItem(KEY, JSON.stringify(appData));
-        atualizarDatalist();
-    }
+    function salvar() { localStorage.setItem(KEY, JSON.stringify(appData)); }
 
-    function atualizarDatalist() {
-        const list = document.getElementById('sugestoesProdutos');
-        if(!list) return;
-        const nomes = Object.values(appData.catalogo).map(i => i.nome);
-        list.innerHTML = [...new Set(nomes)].map(n => `<option value="${n}">`).join('');
-    }
-
-    async function buscarEanOnline(ean) {
+    async function buscarEanOnline(ean, campoNome) {
         if (ean.length < 8) return;
         const loader = document.getElementById('loadingEan');
-        if(loader) loader.style.display = 'block';
+        loader.style.display = 'block';
         try {
-            const response = await fetch(`https://world.openfoodfacts.org/api/v0/product/${ean}.json`);
-            const data = await response.json();
+            const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${ean}.json`);
+            const data = await res.json();
             if (data.status === 1) {
-                document.getElementById('catNome').value = data.product.product_name || data.product.generic_name || "";
+                document.getElementById(campoNome).value = data.product.product_name || data.product.generic_name || "";
             }
         } catch (e) {}
-        if(loader) loader.style.display = 'none';
+        loader.style.display = 'none';
     }
 
-    function autoPreencher(valor, contexto) {
-        if(!valor) return;
-        if(contexto === 'catalogo' && (valor.length === 13 || valor.length === 8)) {
-            buscarEanOnline(valor);
-        }
-        let item = appData.catalogo[valor] || Object.values(appData.catalogo).find(i => i.nome.toLowerCase() === valor.toLowerCase());
-        if (item) {
-            const eanEncontrado = Object.keys(appData.catalogo).find(key => appData.catalogo[key] === item);
-            if (contexto === 'catalogo') {
-                document.getElementById('catEan').value = eanEncontrado.startsWith('INT_') ? "" : eanEncontrado;
-                document.getElementById('catNome').value = item.nome;
-                document.getElementById('catPreco').value = item.preco;
-                document.getElementById('catCatSelect').value = item.categoria;
+    function autoPreencher(ean, contexto) {
+        if (ean.length >= 8) {
+            const item = appData.catalogo[ean];
+            if (item) {
+                if (contexto === 'lista') {
+                    document.getElementById('prodNome').value = item.nome;
+                    document.getElementById('prodValP').value = item.preco;
+                    document.getElementById('prodCatSelect').value = item.categoria;
+                } else {
+                    document.getElementById('catNome').value = item.nome;
+                    document.getElementById('catPreco').value = item.preco;
+                    document.getElementById('catCatSelect').value = item.categoria;
+                }
             } else {
-                document.getElementById('prodNome').value = item.nome;
-                document.getElementById('prodValP').value = item.preco;
-                document.getElementById('prodCatSelect').value = item.categoria;
+                // Se não tem no catálogo, busca na internet
+                buscarEanOnline(ean, contexto === 'lista' ? 'prodNome' : 'catNome');
             }
         }
     }
@@ -173,117 +155,73 @@
         document.getElementById('modalScanner').style.display = 'flex';
         Quagga.init({
             inputStream: { name: "Live", type: "LiveStream", target: document.querySelector('#interactive'), constraints: { facingMode: "environment" } },
-            decoder: { readers: ["ean_reader", "ean_8_reader"] }
+            decoder: { readers: ["ean_reader", "ean_8_reader"], multiple: false }
         }, (err) => {
-            if (err) { alert("Câmera não disponível"); return; }
+            if (err) return;
             Quagga.start();
         });
-        Quagga.onDetected(processarLeitura);
-    }
-
-    function processarLeitura(data) {
-        const code = data.codeResult.code;
-        if (code.length === 13 || code.length === 8) {
-            if (navigator.vibrate) navigator.vibrate(100);
-            Quagga.offDetected(); Quagga.stop();
-            document.getElementById('modalScanner').style.display = 'none';
-            if (scannerAlvo === 'catalogo') { 
-                document.getElementById('catEan').value = code; 
-                autoPreencher(code, 'catalogo'); 
-            } else { 
-                autoPreencher(code, 'lista'); 
+        Quagga.onDetected(res => {
+            const code = res.codeResult.code;
+            // Só aceita se for 8 ou 13 dígitos
+            if (code.length === 8 || code.length === 13) {
+                if (navigator.vibrate) navigator.vibrate(100);
+                pararLeitor();
+                if (scannerAlvo === 'lista') {
+                    document.getElementById('prodEan').value = code;
+                    autoPreencher(code, 'lista');
+                } else {
+                    document.getElementById('catEan').value = code;
+                    autoPreencher(code, 'catalogo');
+                }
             }
-        }
+        });
     }
 
-    function pararLeitor() { Quagga.offDetected(); Quagga.stop(); document.getElementById('modalScanner').style.display = 'none'; }
+    function pararLeitor() { Quagga.stop(); document.getElementById('modalScanner').style.display = 'none'; }
 
-    function abrirModalCatalogo() { 
-        document.getElementById('modalCatalogo').style.display = 'flex'; 
-        document.getElementById('catCatSelect').innerHTML = appData.categorias.map(c => `<option value="${c}">${c}</option>`).join('');
-        renderCatalogo(); 
-    }
-    function fecharModalCatalogo() { document.getElementById('modalCatalogo').style.display = 'none'; }
-    
-    function salvarNoCatalogo() {
-        let ean = document.getElementById('catEan').value.trim();
-        const nome = document.getElementById('catNome').value.trim();
-        const preco = parseFloat(document.getElementById('catPreco').value) || 0;
-        const cat = document.getElementById('catCatSelect').value;
-        if (!nome) return;
-        if (!ean) ean = "INT_" + nome.toUpperCase().replace(/\s+/g, '_');
-        appData.catalogo[ean] = { nome, preco, categoria: cat };
-        salvar(); renderCatalogo();
-        document.getElementById('catEan').value = ""; document.getElementById('catNome').value = ""; document.getElementById('catPreco').value = "";
-    }
-
-    function renderCatalogo() {
-        document.getElementById('listaItensCatalogo').innerHTML = Object.keys(appData.catalogo).map(ean => `
-            <div style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid #eee; font-size:0.8rem">
-                <span><b>${appData.catalogo[ean].nome}</b><br><small>${ean.startsWith('INT_') ? '(Sem EAN)' : ean}</small></span>
-                <span onclick="if(confirm('Excluir?')){delete appData.catalogo['${ean}']; salvar(); renderCatalogo();}" style="color:red">🗑️</span>
-            </div>`).join('');
-    }
-
-    function abrirModalCats() { document.getElementById('modalCats').style.display='flex'; renderCatsList(); }
-    function renderCatsList() {
-        document.getElementById('listaCategoriasEdicao').innerHTML = appData.categorias.map((c, i) => `
-            <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee">
-                <span>${c}</span>
-                <b onclick="appData.categorias.splice(${i},1); salvar(); renderCatsList();" style="color:red">🗑️</b>
-            </div>`).join('');
-    }
-    function addCat() { const n = prompt("Nome da categoria:"); if(n){appData.categorias.push(n); salvar(); renderCatsList();}}
-
-    let listaAtiva = null;
     function criarNovaLista() {
         const n = document.getElementById('novaListaNome').value.trim();
-        if(n) { appData.listas[n] = []; salvar(); abrirLista(n); document.getElementById('novaListaNome').value=""; }
+        if(n) { appData.listas[n] = []; salvar(); renderHome(); abrirLista(n); }
     }
+
     function abrirLista(id) {
         listaAtiva = id;
         document.getElementById('screenHome').classList.remove('active');
         document.getElementById('screenEditor').classList.add('active');
         document.getElementById('tituloListaAtual').innerText = id;
         document.getElementById('prodCatSelect').innerHTML = appData.categorias.map(c => `<option value="${c}">${c}</option>`).join('');
-        atualizarDatalist();
         renderItens();
-    }
-    function irParaHome() { document.getElementById('screenEditor').classList.remove('active'); document.getElementById('screenHome').classList.add('active'); renderHome(); }
-    function renderHome() {
-        document.getElementById('listaDeArquivos').innerHTML = Object.keys(appData.listas).map(id => `
-            <div class="list-card">
-                <b onclick="abrirLista('${id}')" style="flex:1">${id}</b>
-                <b onclick="if(confirm('Apagar?')){delete appData.listas['${id}']; salvar(); renderHome();}" style="color:red">🗑️</b>
-            </div>`).join('');
     }
 
     function adicionarItem() {
         const nome = document.getElementById('prodNome').value;
+        const ean = document.getElementById('prodEan').value;
         if(!nome) return;
         appData.listas[listaAtiva].push({
-            nome, cat: document.getElementById('prodCatSelect').value,
+            nome, ean, cat: document.getElementById('prodCatSelect').value,
             qtdP: parseFloat(document.getElementById('prodQtdP').value) || 1,
             valP: parseFloat(document.getElementById('prodValP').value) || 0,
             qtdR: parseFloat(document.getElementById('prodQtdP').value) || 1,
             valR: 0, noCarrinho: false
         });
         salvar(); renderItens();
-        document.getElementById('prodNome').value = ""; document.getElementById('prodValP').value = "";
+        document.getElementById('prodNome').value = ""; document.getElementById('prodEan').value = "";
     }
 
     function renderItens() {
         const container = document.getElementById('corpoLista'); container.innerHTML = "";
         const itens = appData.listas[listaAtiva] || [];
-        const catsExistentes = [...new Set(itens.map(i => i.cat))];
-        catsExistentes.forEach(cat => {
+        const cats = [...new Set(itens.map(i => i.cat))];
+        cats.forEach(cat => {
             container.innerHTML += `<div class="category-header">${cat}</div>`;
             itens.filter(i => i.cat === cat).forEach(item => {
                 const idx = itens.indexOf(item);
                 container.innerHTML += `
                 <div class="item-row">
-                    <div style="display:flex; justify-content:space-between; font-weight:bold;"><span>${item.nome}</span>
-                    <span onclick="appData.listas[listaAtiva].splice(${idx},1);salvar();renderItens();" style="color:red">🗑️</span></div>
+                    <div style="display:flex; justify-content:space-between; font-weight:bold;">
+                        <span>${item.nome}</span>
+                        <span onclick="appData.listas[listaAtiva].splice(${idx},1);salvar();renderItens();" style="color:red">🗑️</span>
+                    </div>
                     <div class="calc-grid">
                         <input type="checkbox" ${item.noCarrinho?'checked':''} onclick="appData.listas[listaAtiva][${idx}].noCarrinho=!appData.listas[listaAtiva][${idx}].noCarrinho;salvar();">
                         <small>PREV</small><div>${item.qtdP}</div><div>${item.valP.toFixed(2)}</div><div style="text-align:right">${(item.qtdP*item.valP).toFixed(2)}</div>
@@ -308,8 +246,44 @@
         document.getElementById('totalReal').innerText = `R$ ${tR.toFixed(2)}`;
     }
 
-    function exportarBackup() { prompt("Copie o backup:", btoa(unescape(encodeURIComponent(JSON.stringify(appData))))); }
-    function importarBackup() { const c = prompt("Cole o backup:"); if(c){ appData=JSON.parse(decodeURIComponent(escape(atob(c)))); salvar(); location.reload(); }}
+    function abrirModalCatalogo() { 
+        document.getElementById('modalCatalogo').style.display = 'flex'; 
+        document.getElementById('catCatSelect').innerHTML = appData.categorias.map(c => `<option value="${c}">${c}</option>`).join('');
+        renderCatalogo(); 
+    }
+    function fecharModalCatalogo() { document.getElementById('modalCatalogo').style.display = 'none'; }
+    function salvarNoCatalogo() {
+        const ean = document.getElementById('catEan').value;
+        const nome = document.getElementById('catNome').value;
+        if(!ean || !nome) return;
+        appData.catalogo[ean] = { nome, preco: parseFloat(document.getElementById('catPreco').value)||0, categoria: document.getElementById('catCatSelect').value };
+        salvar(); renderCatalogo();
+    }
+    function renderCatalogo() {
+        document.getElementById('listaItensCatalogo').innerHTML = Object.keys(appData.catalogo).map(ean => `
+            <div style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid #eee; font-size:0.8rem">
+                <span><b>${appData.catalogo[ean].nome}</b></span>
+                <span onclick="delete appData.catalogo['${ean}']; salvar(); renderCatalogo();" style="color:red">🗑️</span>
+            </div>`).join('');
+    }
+
+    function abrirModalCats() { document.getElementById('modalCats').style.display='flex'; renderCatsList(); }
+    function renderCatsList() {
+        document.getElementById('listaCategoriasEdicao').innerHTML = appData.categorias.map((c, i) => `
+            <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee">
+                <span>${c}</span>
+                <b onclick="appData.categorias.splice(${i},1); salvar(); renderCatsList();" style="color:red">🗑️</b>
+            </div>`).join('');
+    }
+    function addCat() { const n = prompt("Nome:"); if(n){appData.categorias.push(n); salvar(); renderCatsList();}}
+    function irParaHome() { document.getElementById('screenEditor').classList.remove('active'); document.getElementById('screenHome').classList.add('active'); renderHome(); }
+    function renderHome() {
+        document.getElementById('listaDeArquivos').innerHTML = Object.keys(appData.listas).map(id => `
+            <div class="list-card">
+                <b onclick="abrirLista('${id}')" style="flex:1">${id}</b>
+                <b onclick="if(confirm('Apagar?')){delete appData.listas['${id}']; salvar(); renderHome();}" style="color:red">🗑️</b>
+            </div>`).join('');
+    }
 
     renderHome();
 </script>
